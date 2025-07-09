@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { z } from 'zod';
 import { predictStockTrends, type PredictStockTrendsOutput } from '@/ai/flows/predict-stock-trends';
 import { useToast } from '@/hooks/use-toast';
@@ -15,12 +15,29 @@ import { getStockData } from './actions';
 
 const stockSymbolSchema = z.string().min(1, 'Stock symbol is required.').max(5, 'Stock symbol must be 5 characters or less.');
 
+const XP_PER_ANALYSIS = 25;
+const getXpForNextLevel = (level: number) => level * 100;
+
 export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [stockData, setStockData] = useState<{ details: any; historical: any[]; prediction?: PredictStockTrendsOutput; analysis?: string; symbol?: string; timeframe?: string; } | null>(null);
+  
+  const [level, setLevel] = useState(1);
+  const [xp, setXp] = useState(0);
+  const [xpToNextLevel, setXpToNextLevel] = useState(getXpForNextLevel(1));
+
   const { toast } = useToast();
   
+  useEffect(() => {
+    if (xp >= xpToNextLevel) {
+      const newLevel = level + 1;
+      setLevel(newLevel);
+      setXp(xp - xpToNextLevel);
+      setXpToNextLevel(getXpForNextLevel(newLevel));
+    }
+  }, [xp, level, xpToNextLevel]);
+
   const handleSearch = async (symbol: string, timeframe: string) => {
     try {
       stockSymbolSchema.parse(symbol);
@@ -50,6 +67,8 @@ export default function Home() {
         timeframe,
       });
 
+      setXp(currentXp => currentXp + XP_PER_ANALYSIS);
+
     } catch (e: any) {
       const errorMessage = e instanceof z.ZodError ? e.errors[0].message : e.message || 'An unexpected error occurred.';
       setError(errorMessage);
@@ -65,7 +84,7 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-background">
-      <Header />
+      <Header level={level} xp={xp} xpToNextLevel={xpToNextLevel} />
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
         <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
           <div className="md:col-span-1 lg:col-span-1 space-y-4">
