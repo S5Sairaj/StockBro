@@ -22,6 +22,10 @@ export type PredictStockTrendsInput = z.infer<typeof PredictStockTrendsInputSche
 const PredictStockTrendsOutputSchema = z.object({
   trendPrediction: z.string().describe('Predicted stock trend line data, in a format plottable on a chart.'),
   analysis: z.string().describe('A summary of the factors influencing the predicted trend.'),
+  indicatorRecommendations: z.array(z.object({
+    name: z.string().describe('The name of the recommended financial indicator (e.g., "Moving Average Convergence Divergence (MACD)")'),
+    description: z.string().describe('A brief explanation of what the indicator measures and how it can be used.'),
+  })).describe('A list of recommended technical indicators for further analysis.')
 });
 
 export type PredictStockTrendsOutput = z.infer<typeof PredictStockTrendsOutputSchema>;
@@ -39,11 +43,13 @@ const prompt = ai.definePrompt({
 You will analyze the historical stock data for the given stock symbol and timeframe, and predict the future trend.
 Your analysis should consider recency bias, volatility, and market sentiment (derived from news APIs, which are not available to you, so make a reasonable assumption).
 
+Also, provide a list of 3-5 technical indicators that would be most beneficial for a user to analyze for this specific stock to "increase the chance of getting money". For each indicator, provide its name and a concise description of what it measures and why it's useful for this stock.
+
 Stock Symbol: {{{stockSymbol}}}
 Historical Data: {{{historicalData}}}
 Timeframe: {{{timeframe}}}
 
-Based on this information, predict the stock trend and provide the predicted trend line data and a summary of your analysis.
+Based on this information, predict the stock trend and provide the predicted trend line data, a summary of your analysis, and your indicator recommendations.
 The trendPrediction should be formatted as a series of date and price point pairs: "[[date1, price1], [date2, price2], ...]"
 `,
 });

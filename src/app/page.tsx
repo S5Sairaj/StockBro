@@ -8,6 +8,7 @@ import Header from '@/components/header';
 import StockForm from '@/components/stock-form';
 import StockDetails from '@/components/stock-details';
 import PriceChart from '@/components/price-chart';
+import IndicatorRecommendations from '@/components/indicator-recommendations';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getStockData } from './actions';
@@ -66,13 +67,20 @@ export default function Home() {
     <div className="flex min-h-screen w-full flex-col bg-background">
       <Header />
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-          <Card className="lg:col-span-2">
-            <CardContent className="p-6">
-              <StockForm onSearch={handleSearch} loading={loading} />
-            </CardContent>
-          </Card>
-          <div className="lg:col-span-5">
+        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+          <div className="md:col-span-1 lg:col-span-1 space-y-4">
+            <Card>
+              <CardContent className="p-6">
+                <StockForm onSearch={handleSearch} loading={loading} />
+              </CardContent>
+            </Card>
+            
+            {!loading && stockData && stockData.prediction?.indicatorRecommendations && (
+              <IndicatorRecommendations indicators={stockData.prediction.indicatorRecommendations} />
+            )}
+          </div>
+
+          <div className="md:col-span-2 lg:col-span-3">
             {loading && (
               <Card>
                 <CardContent className="p-6">
