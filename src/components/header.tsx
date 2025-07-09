@@ -13,14 +13,14 @@ export default function Header({ level, xp, xpToNextLevel, isExpert }: HeaderPro
   const progressPercentage = (xp / xpToNextLevel) * 100;
 
   return (
-    <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 z-10">
+    <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-accent text-accent-foreground px-4 md:px-6 z-10">
       <div className="flex items-center gap-2">
-        <CandlestickChart className="h-6 w-6 text-primary" />
+        <CandlestickChart className="h-6 w-6" />
         <h1 className="text-xl font-bold tracking-tight">MarketGazer</h1>
       </div>
       <div className="ml-auto flex items-center gap-4">
         {isExpert && (
-            <Badge variant="outline" className="flex items-center gap-1 border-trophy text-trophy">
+            <Badge variant="outline" className="flex items-center gap-1 border-trophy text-trophy hover:bg-accent-foreground/10">
                 <Star className="h-4 w-4" />
                 Expert
             </Badge>
@@ -31,7 +31,7 @@ export default function Header({ level, xp, xpToNextLevel, isExpert }: HeaderPro
         </div>
         <div className="w-32">
           <Progress value={progressPercentage} className="h-2" />
-          <p className="text-xs text-muted-foreground text-center mt-1">
+          <p className="text-xs text-accent-foreground/70 text-center mt-1">
             {xp} / {xpToNextLevel} XP
           </p>
         </div>
