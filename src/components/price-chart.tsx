@@ -6,7 +6,7 @@ import { Line, LineChart, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContain
 
 interface PriceChartProps {
   historicalData: { date: string; price: number }[];
-  predictionData?: [string, number][];
+  predictionData?: { date: string; price: number }[];
 }
 
 const chartConfig = {
@@ -21,9 +21,9 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 // Helper function to format the prediction data
-const formatPredictionData = (predictionTuples: [string, number][] | undefined) => {
-  if (!predictionTuples || !Array.isArray(predictionTuples)) return [];
-  return predictionTuples.map(([date, price]) => ({
+const formatPredictionData = (predictionObjects: { date: string; price: number }[] | undefined) => {
+  if (!predictionObjects || !Array.isArray(predictionObjects)) return [];
+  return predictionObjects.map(({ date, price }) => ({
     date,
     prediction: price,
   }));

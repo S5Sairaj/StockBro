@@ -23,11 +23,11 @@ export type PredictStockTrendsInput = z.infer<typeof PredictStockTrendsInputSche
 
 const PredictStockTrendsOutputSchema = z.object({
   trendPrediction: z.array(
-    z.tuple([
-      z.string().describe('The date in YYYY-MM-DD format.'),
-      z.number().describe('The predicted price.')
-    ])
-  ).describe('An array of tuples, where each tuple contains a date string and the predicted stock price for that date.'),
+    z.object({
+      date: z.string().describe('The date in YYYY-MM-DD format.'),
+      price: z.number().describe('The predicted price.')
+    })
+  ).describe('An array of objects, where each object contains a date string and the predicted stock price for that date.'),
   analysis: z.string().describe('A summary of the factors influencing the predicted trend.'),
   indicatorRecommendations: z.array(z.object({
     name: z.string().describe('The name of the recommended financial indicator (e.g., "Moving Average Convergence Divergence (MACD)")'),
