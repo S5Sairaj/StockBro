@@ -22,7 +22,12 @@ const PredictStockTrendsInputSchema = z.object({
 export type PredictStockTrendsInput = z.infer<typeof PredictStockTrendsInputSchema>;
 
 const PredictStockTrendsOutputSchema = z.object({
-  trendPrediction: z.string().describe('Predicted stock trend line data, in a format plottable on a chart.'),
+  trendPrediction: z.array(
+    z.tuple([
+      z.string().describe('The date in YYYY-MM-DD format.'),
+      z.number().describe('The predicted price.')
+    ])
+  ).describe('An array of tuples, where each tuple contains a date string and the predicted stock price for that date.'),
   analysis: z.string().describe('A summary of the factors influencing the predicted trend.'),
   indicatorRecommendations: z.array(z.object({
     name: z.string().describe('The name of the recommended financial indicator (e.g., "Moving Average Convergence Divergence (MACD)")'),
@@ -57,8 +62,7 @@ Historical Data: {{{historicalData}}}
 Timeframe: {{{timeframe}}}
 User Level: {{{userLevel}}}
 
-Based on this information, predict the stock trend and provide the predicted trend line data, a summary of your analysis, and your indicator recommendations.
-The trendPrediction should be formatted as a series of date and price point pairs: "[[date1, price1], [date2, price2], ...]"
+Based on this information, provide a summary of your analysis, your indicator recommendations, and the predicted stock trend data.
 `,
 });
 

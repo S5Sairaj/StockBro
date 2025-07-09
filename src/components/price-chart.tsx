@@ -6,7 +6,7 @@ import { Line, LineChart, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContain
 
 interface PriceChartProps {
   historicalData: { date: string; price: number }[];
-  predictionData?: string;
+  predictionData?: [string, number][];
 }
 
 const chartConfig = {
@@ -20,28 +20,18 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-// Helper function to parse the prediction string
-const parsePredictionData = (predictionString: string | undefined) => {
-  if (!predictionString) return [];
-  try {
-    const cleanedString = predictionString.replace(/'/g, '"');
-    const data = JSON.parse(cleanedString);
-    if (Array.isArray(data)) {
-      return data.map(([date, price]) => ({
-        date,
-        prediction: price,
-      }));
-    }
-    return [];
-  } catch (error) {
-    console.error("Failed to parse prediction data:", error);
-    return [];
-  }
+// Helper function to format the prediction data
+const formatPredictionData = (predictionTuples: [string, number][] | undefined) => {
+  if (!predictionTuples || !Array.isArray(predictionTuples)) return [];
+  return predictionTuples.map(([date, price]) => ({
+    date,
+    prediction: price,
+  }));
 };
 
 
 export default function PriceChart({ historicalData, predictionData }: PriceChartProps) {
-  const parsedPrediction = parsePredictionData(predictionData);
+  const parsedPrediction = formatPredictionData(predictionData);
 
   const combinedData = historicalData.map(hist => {
     const pred = parsedPrediction.find(p => p.date === hist.date);
