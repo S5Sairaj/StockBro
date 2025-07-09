@@ -1,13 +1,15 @@
-import { CandlestickChart, Trophy } from 'lucide-react';
+import { CandlestickChart, Trophy, Star } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
 
 interface HeaderProps {
   level: number;
   xp: number;
   xpToNextLevel: number;
+  isExpert: boolean;
 }
 
-export default function Header({ level, xp, xpToNextLevel }: HeaderProps) {
+export default function Header({ level, xp, xpToNextLevel, isExpert }: HeaderProps) {
   const progressPercentage = (xp / xpToNextLevel) * 100;
 
   return (
@@ -17,6 +19,12 @@ export default function Header({ level, xp, xpToNextLevel }: HeaderProps) {
         <h1 className="text-xl font-bold tracking-tight">MarketGazer</h1>
       </div>
       <div className="ml-auto flex items-center gap-4">
+        {isExpert && (
+            <Badge variant="outline" className="flex items-center gap-1 border-trophy text-trophy">
+                <Star className="h-4 w-4" />
+                Expert
+            </Badge>
+        )}
         <div className="flex items-center gap-2">
           <Trophy className="h-6 w-6 text-trophy" />
           <span className="font-bold text-lg">Level {level}</span>
