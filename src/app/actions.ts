@@ -59,10 +59,15 @@ export async function getStockData(symbol: string, timeframe: string) {
 
 export async function getTrendingStocks() {
     try {
-        const result = await yahooFinance.trendingSymbols('US', { count: 5 });
-        const quotes = result.quotes.filter(q => q.quoteType === 'EQUITY' && q.regularMarketPrice && q.regularMarketChange);
+        const result = await yahooFinance.trendingSymbols('US', { count: 10 }); // Fetch more to ensure we get enough valid ones
+        const quotes = result.quotes.filter(q => 
+            q.quoteType === 'EQUITY' && 
+            q.regularMarketPrice && 
+            q.regularMarketChange &&
+            q.regularMarketChangePercent
+        );
         
-        const trending = quotes.map(q => ({
+        const trending = quotes.slice(0, 5).map(q => ({
             symbol: q.symbol,
             name: q.longName || q.shortName || q.symbol,
             price: q.regularMarketPrice || 0,
