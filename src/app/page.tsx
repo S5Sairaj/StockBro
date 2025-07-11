@@ -9,9 +9,10 @@ import StockForm from '@/components/stock-form';
 import StockDetails from '@/components/stock-details';
 import PriceChart from '@/components/price-chart';
 import IndicatorRecommendations from '@/components/indicator-recommendations';
+import TrendingStocks from '@/components/trending-stocks';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getStockData } from './actions';
+import { getStockData, getTrendingStocks } from './actions';
 
 const stockSymbolSchema = z.string().min(1, 'Stock symbol is required.').max(5, 'Stock symbol must be 5 characters or less.');
 
@@ -23,6 +24,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [stockData, setStockData] = useState<{ details: any; historical: any[]; prediction?: PredictStockTrendsOutput; analysis?: string; symbol?: string; timeframe?: string; } | null>(null);
+  const [trendingStocks, setTrendingStocks] = useState<any[]>([]);
+  const [isTrendingLoading, setIsTrendingLoading] = useState(true);
   
   const [level, setLevel] = useState(1);
   const [xp, setXp] = useState(0);
@@ -30,6 +33,21 @@ export default function Home() {
 
   const { toast } = useToast();
   
+  useEffect(() => {
+    async function fetchTrending() {
+      try {
+        setIsTrendingLoading(true);
+        const trending = await getTrendingStocks();
+        setTrendingStocks(trending);
+      } catch (e) {
+        console.error("Failed to load trending stocks", e);
+      } finally {
+        setIsTrendingLoading(false);
+      }
+    }
+    fetchTrending();
+  }, []);
+
   useEffect(() => {
     if (xp >= xpToNextLevel) {
       const oldLevel = level;
@@ -102,6 +120,11 @@ export default function Home() {
   };
 
   const isExpert = level >= EXPERT_LEVEL_THRESHOLD;
+  
+  const handleTrendingClick = (symbol: string) => {
+    handleSearch(symbol, 'daily');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-background">
@@ -118,6 +141,12 @@ export default function Home() {
             {!loading && stockData && stockData.prediction?.indicatorRecommendations && (
               <IndicatorRecommendations indicators={stockData.prediction.indicatorRecommendations} />
             )}
+
+            <TrendingStocks 
+                stocks={trendingStocks} 
+                isLoading={isTrendingLoading} 
+                onStockClick={handleTrendingClick}
+            />
           </div>
 
           <div className="md:col-span-2 lg:col-span-3">

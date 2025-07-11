@@ -55,3 +55,24 @@ export async function getStockData(symbol: string, timeframe: string) {
         throw new Error('An external service error occurred while fetching stock data.');
     }
 }
+
+
+export async function getTrendingStocks() {
+    try {
+        const result = await yahooFinance.trendingSymbols('US', { count: 5 });
+        const quotes = result.quotes.filter(q => q.quoteType === 'EQUITY' && q.regularMarketPrice && q.regularMarketChange);
+        
+        const trending = quotes.map(q => ({
+            symbol: q.symbol,
+            name: q.longName || q.shortName || q.symbol,
+            price: q.regularMarketPrice || 0,
+            change: q.regularMarketChange || 0,
+            changePercent: q.regularMarketChangePercent || 0,
+        }));
+
+        return trending;
+    } catch (error) {
+        console.error('Failed to fetch trending stocks:', error);
+        return [];
+    }
+}
