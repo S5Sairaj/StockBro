@@ -16,40 +16,34 @@ const chartConfig = {
   },
   prediction: {
     label: "AI Prediction",
-    color: "hsl(var(--accent))",
+    color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig;
 
-// Helper function to format the prediction data
-const formatPredictionData = (predictionObjects: { date: string; price: number }[] | undefined) => {
-  if (!predictionObjects || !Array.isArray(predictionObjects)) return [];
-  return predictionObjects.map(({ date, price }) => ({
-    date,
-    prediction: price,
-  }));
-};
-
-
 export default function PriceChart({ historicalData, predictionData }: PriceChartProps) {
-  const parsedPrediction = formatPredictionData(predictionData);
 
-  const combinedData = historicalData.map(hist => {
-    const pred = parsedPrediction.find(p => p.date === hist.date);
-    return {
-      date: hist.date,
-      price: hist.price,
-      prediction: pred ? pred.prediction : null,
-    };
-  });
+  // Map historical data for the chart
+  const mappedHistorical = historicalData.map(d => ({ date: d.date, price: d.price }));
   
-  parsedPrediction.forEach(pred => {
-      if (!combinedData.some(d => d.date === pred.date)) {
-          combinedData.push({
-              date: pred.date,
-              price: null,
-              prediction: pred.prediction,
-          });
-      }
+  // Map prediction data for the chart
+  const mappedPrediction = predictionData ? predictionData.map(d => ({ date: d.date, prediction: d.price })) : [];
+
+  // Combine the data for rendering
+  const combinedData = [...mappedHistorical];
+
+  mappedPrediction.forEach(pred => {
+    const existingEntry = combinedData.find(d => d.date === pred.date);
+    if (existingEntry) {
+      // If date exists, add prediction to it
+      (existingEntry as any).prediction = pred.prediction;
+    } else {
+      // If date does not exist, add a new entry
+      combinedData.push({
+          date: pred.date,
+          price: null,
+          prediction: pred.prediction,
+      });
+    }
   });
 
   combinedData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());

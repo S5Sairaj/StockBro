@@ -10,7 +10,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import yahooFinance from 'yahoo-finance2';
 
 const PredictStockTrendsInputSchema = z.object({
   stockSymbol: z.string().describe('The stock symbol for which to predict trends.'),
@@ -53,7 +52,7 @@ You are advising an expert investor. Provide a highly technical and in-depth ana
 You are advising a beginner investor. Explain your reasoning clearly and avoid jargon. Your goal is to be educational and provide a straightforward analysis.
 {{/if}}
 
-You will analyze the historical stock data for the given stock symbol and timeframe, and predict the future trend.
+You will analyze the historical stock data for the given stock symbol and timeframe, and predict the future trend. Your prediction should extend for a reasonable period beyond the provided historical data (e.g., for about 20-30% of the historical data's timespan).
 Your analysis should consider recency bias, volatility, and market sentiment (derived from news APIs, which are not available to you, so make a reasonable assumption).
 
 Also, provide a list of {{#if isExpert}}5-7{{else}}3-5{{/if}} technical indicators that would be most beneficial for a user to analyze for this specific stock to "increase the chance of getting money". For each indicator, provide its name and a concise description of what it measures and why it's useful for this stock.
@@ -63,7 +62,7 @@ Historical Data: {{{historicalData}}}
 Timeframe: {{{timeframe}}}
 User Level: {{{userLevel}}}
 
-Based on this information, provide a summary of your analysis, your indicator recommendations, and the predicted stock trend data.
+Based on this information, provide a summary of your analysis, your indicator recommendations, and the predicted stock trend data in the specified format.
 `,
 });
 
