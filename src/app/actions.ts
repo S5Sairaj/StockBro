@@ -59,13 +59,13 @@ export async function getStockData(symbol: string, timeframe: string) {
 
 export async function getTrendingStocks() {
     try {
-        const result = await yahooFinance.trendingSymbols('US', { count: 10 }); // Fetch more to ensure we get enough valid ones
-        const quotes = result.quotes.filter(q => 
+        const result = await yahooFinance.trendingSymbols('US', { count: 10 });
+        const quotes = result.quotes?.filter(q => 
             q.quoteType === 'EQUITY' && 
-            q.regularMarketPrice && 
-            q.regularMarketChange &&
-            q.regularMarketChangePercent
-        );
+            typeof q.regularMarketPrice === 'number' && 
+            typeof q.regularMarketChange === 'number' &&
+            typeof q.regularMarketChangePercent === 'number'
+        ) || [];
         
         const trending = quotes.slice(0, 5).map(q => ({
             symbol: q.symbol,
@@ -77,7 +77,12 @@ export async function getTrendingStocks() {
 
         return trending;
     } catch (error) {
-        console.error('Failed to fetch trending stocks:', error);
+        if (error instanceof Error) {
+            console.error('Failed to fetch trending stocks:', error.message);
+            console.error('Stack trace:', error.stack);
+        } else {
+            console.error('An unknown error occurred while fetching trending stocks:', error);
+        }
         return [];
     }
 }
