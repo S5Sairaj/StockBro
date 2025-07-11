@@ -42,46 +42,10 @@ export async function predictStockTrends(input: PredictStockTrendsInput): Promis
   return predictStockTrendsFlow(input);
 }
 
-const getTrendingStocks = ai.defineTool(
-  {
-    name: 'getTrendingStocks',
-    description: 'Returns a list of trending stocks in the US market.',
-    inputSchema: z.object({}),
-    outputSchema: z.array(z.object({
-      symbol: z.string(),
-      name: z.string(),
-      price: z.number(),
-      change: z.number(),
-      changePercent: z.number()
-    })),
-  },
-  async () => {
-    try {
-      const result = await yahooFinance.trendingSymbols('US', { count: 5 });
-      const quotes = result.quotes.filter(q => q.quoteType === 'EQUITY');
-      
-      const trending = quotes.map(q => ({
-        symbol: q.symbol,
-        name: q.longName || q.shortName || q.symbol,
-        price: q.regularMarketPrice || 0,
-        change: q.regularMarketChange || 0,
-        changePercent: q.regularMarketChangePercent || 0,
-      }));
-
-      return trending;
-    } catch (error) {
-      console.error('Failed to fetch trending stocks:', error);
-      return [];
-    }
-  }
-);
-
-
 const prompt = ai.definePrompt({
   name: 'predictStockTrendsPrompt',
   input: {schema: PredictStockTrendsInputSchema},
   output: {schema: PredictStockTrendsOutputSchema},
-  tools: [getTrendingStocks],
   prompt: `You are a financial analyst specializing in stock market trend prediction.
 {{#if isExpert}}
 You are advising an expert investor. Provide a highly technical and in-depth analysis, assuming a high level of financial literacy. Focus on nuanced market signals, advanced metrics, and potential black swan events.
