@@ -9,23 +9,17 @@ export default function Header() {
         <CandlestickChart className="h-6 w-6" />
         <h1 className="text-xl font-bold tracking-tight">StockBro</h1>
       </Link>
-      <nav className="flex-1">
-        <ul className="flex items-center gap-4">
-          <li>
-            <Button variant="link" asChild>
-              <Link href="/about" className="text-primary-foreground/80 transition-colors hover:text-primary-foreground">
-                About
-              </Link>
-            </Button>
-          </li>
-          <li>
-            <Button variant="link" asChild>
-              <Link href="/contact" className="text-primary-foreground/80 transition-colors hover:text-primary-foreground">
-                Contact
-              </Link>
-            </Button>
-          </li>
-        </ul>
+      <nav className="ml-auto flex items-center gap-4">
+          <Button variant="link" asChild>
+            <Link href="/about" className="text-primary-foreground/80 transition-colors hover:text-primary-foreground">
+              About
+            </Link>
+          </Button>
+          <Button variant="link" asChild>
+            <Link href="/contact" className="text-primary-foreground/80 transition-colors hover:text-primary-foreground">
+              Contact
+            </Link>
+          </Button>
       </nav>
     </header>
   );
