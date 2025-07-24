@@ -18,6 +18,20 @@ export default function Header() {
               </Link>
             </Button>
           </li>
+          <li>
+            <Button variant="link" asChild>
+              <Link href="/about" className="text-primary-foreground/80 transition-colors hover:text-primary-foreground">
+                About
+              </Link>
+            </Button>
+          </li>
+          <li>
+            <Button variant="link" asChild>
+              <Link href="/contact" className="text-primary-foreground/80 transition-colors hover:text-primary-foreground">
+                Contact
+              </Link>
+            </Button>
+          </li>
         </ul>
       </nav>
     </header>
