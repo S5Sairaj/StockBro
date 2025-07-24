@@ -87,9 +87,9 @@ export async function getTrendingStocks() {
     }
 }
 
-export async function getNews() {
+export async function getNews(query: string = 'market news') {
     try {
-        const result = await yahooFinance.search('market news', { newsCount: 12 });
+        const result = await yahooFinance.search(query, { newsCount: 12 });
         return result.news.map(item => ({
             uuid: item.uuid,
             title: item.title,
@@ -99,7 +99,7 @@ export async function getNews() {
             thumbnail: item.thumbnail?.resolutions?.find(t => t.tag === 'm')?.url
         })).filter(item => item.thumbnail);
     } catch (error) {
-        console.error("Failed to fetch news:", error);
+        console.error(`Failed to fetch news for query "${query}":`, error);
         return [];
     }
 }
