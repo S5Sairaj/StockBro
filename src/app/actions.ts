@@ -89,7 +89,7 @@ export async function getTrendingStocks() {
 
 export async function getNews(query: string = 'market news') {
     try {
-        const result = await yahooFinance.search(query, { newsCount: 12 });
+        const result = await yahooFinance.search(query, { newsCount: 40 });
         return result.news.map(item => ({
             uuid: item.uuid,
             title: item.title,

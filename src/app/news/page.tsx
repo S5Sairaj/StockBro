@@ -78,18 +78,15 @@ export default function NewsPage() {
     const [loading, setLoading] = useState<Record<string, boolean>>({});
     const [activeTab, setActiveTab] = useState(newsCategories[0].value);
 
-    const fetchNewsForCategory = async (categoryValue: string) => {
+    const fetchNewsForCategory = async (categoryValue: string, query: string) => {
         if (news[categoryValue]) return; // Already fetched
 
-        const category = newsCategories.find(c => c.value === categoryValue);
-        if (!category) return;
-        
         try {
             setLoading(prev => ({...prev, [categoryValue]: true}));
-            const newsData = await getNews(category.query);
+            const newsData = await getNews(query);
             setNews(prev => ({ ...prev, [categoryValue]: newsData }));
         } catch (error) {
-            console.error(`Failed to load news for ${category.label}`, error);
+            console.error(`Failed to load news for ${categoryValue}`, error);
             setNews(prev => ({...prev, [categoryValue]: []}));
         } finally {
             setLoading(prev => ({...prev, [categoryValue]: false}));
@@ -97,8 +94,11 @@ export default function NewsPage() {
     };
     
     useEffect(() => {
-        fetchNewsForCategory(activeTab);
-    }, [activeTab]);
+        // Fetch news for all categories on initial load
+        newsCategories.forEach(category => {
+            fetchNewsForCategory(category.value, category.query);
+        });
+    }, []);
 
 
     return (
