@@ -1,7 +1,7 @@
 'use client';
 
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Lightbulb } from 'lucide-react';
 
 interface Indicator {
@@ -30,16 +30,22 @@ export default function IndicatorRecommendations({ indicators }: IndicatorRecomm
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Accordion type="single" collapsible className="w-full">
-          {indicators.map((indicator, index) => (
-            <AccordionItem value={`item-${index}`} key={index}>
-              <AccordionTrigger className="text-left">{indicator.name}</AccordionTrigger>
-              <AccordionContent className="text-muted-foreground">
-                {indicator.description}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Indicator</TableHead>
+              <TableHead>Description</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {indicators.map((indicator, index) => (
+              <TableRow key={index}>
+                <TableCell className="font-medium">{indicator.name}</TableCell>
+                <TableCell className="text-muted-foreground">{indicator.description}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   );
