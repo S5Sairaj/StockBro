@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { z } from 'zod';
 import { predictStockTrends, type PredictStockTrendsOutput } from '@/ai/flows/predict-stock-trends';
 import { useToast } from '@/hooks/use-toast';
-import Header from '@/components/header';
 import StockForm from '@/components/stock-form';
 import StockDetails from '@/components/stock-details';
 import PriceChart from '@/components/price-chart';
@@ -88,65 +87,62 @@ export default function Home() {
   }
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-background">
-      <Header />
-      <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
-        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-          <div className="md:col-span-1 lg:col-span-1 space-y-4">
+    <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <div className="md:col-span-1 lg:col-span-1 space-y-4">
+          <Card>
+            <CardContent className="p-6">
+              <StockForm onSearch={handleSearch} loading={loading} />
+            </CardContent>
+          </Card>
+          
+          {!loading && stockData && stockData.prediction?.indicatorRecommendations && (
+            <IndicatorRecommendations indicators={stockData.prediction.indicatorRecommendations} />
+          )}
+
+          <TrendingStocks 
+              stocks={trendingStocks} 
+              isLoading={isTrendingLoading} 
+              onStockClick={handleTrendingClick}
+          />
+        </div>
+
+        <div className="md:col-span-2 lg:col-span-3">
+          {loading && (
             <Card>
               <CardContent className="p-6">
-                <StockForm onSearch={handleSearch} loading={loading} />
+                <div className="space-y-4">
+                  <Skeleton className="h-8 w-1/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-96 w-full" />
+                </div>
               </CardContent>
             </Card>
-            
-            {!loading && stockData && stockData.prediction?.indicatorRecommendations && (
-              <IndicatorRecommendations indicators={stockData.prediction.indicatorRecommendations} />
-            )}
-
-            <TrendingStocks 
-                stocks={trendingStocks} 
-                isLoading={isTrendingLoading} 
-                onStockClick={handleTrendingClick}
-            />
-          </div>
-
-          <div className="md:col-span-2 lg:col-span-3">
-            {loading && (
-              <Card>
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    <Skeleton className="h-8 w-1/4" />
-                    <Skeleton className="h-4 w-1/2" />
-                    <Skeleton className="h-96 w-full" />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-            {!loading && stockData && (
-              <div className="space-y-4">
-                <StockDetails
-                  symbol={stockData.symbol!}
-                  name={stockData.details.name}
-                  exchange={stockData.details.exchange}
-                  description={stockData.details.description}
-                  analysis={stockData.prediction?.analysis}
-                />
-                <PriceChart 
-                  historicalData={stockData.historical} 
-                  predictionData={stockData.prediction?.trendPrediction}
-                />
-              </div>
-            )}
-            {!loading && !stockData && (
-              <Card className="flex h-[550px] items-center justify-center">
-                <CardContent className="p-6 text-center text-muted-foreground">
-                  <p>Enter a stock symbol to begin analysis.</p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+          )}
+          {!loading && stockData && (
+            <div className="space-y-4">
+              <StockDetails
+                symbol={stockData.symbol!}
+                name={stockData.details.name}
+                exchange={stockData.details.exchange}
+                description={stockData.details.description}
+                analysis={stockData.prediction?.analysis}
+              />
+              <PriceChart 
+                historicalData={stockData.historical} 
+                predictionData={stockData.prediction?.trendPrediction}
+              />
+            </div>
+          )}
+          {!loading && !stockData && (
+            <Card className="flex h-[550px] items-center justify-center">
+              <CardContent className="p-6 text-center text-muted-foreground">
+                <p>Enter a stock symbol to begin analysis.</p>
+              </CardContent>
+            </Card>
+          )}
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }

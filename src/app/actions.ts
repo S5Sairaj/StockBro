@@ -86,3 +86,20 @@ export async function getTrendingStocks() {
         return [];
     }
 }
+
+export async function getNews() {
+    try {
+        const result = await yahooFinance.search('market news', { newsCount: 12 });
+        return result.news.map(item => ({
+            uuid: item.uuid,
+            title: item.title,
+            publisher: item.publisher,
+            link: item.link,
+            providerPublishTime: new Date(item.providerPublishTime * 1000).toLocaleDateString(),
+            thumbnail: item.thumbnail?.resolutions?.find(t => t.tag === 'm')?.url
+        })).filter(item => item.thumbnail);
+    } catch (error) {
+        console.error("Failed to fetch news:", error);
+        return [];
+    }
+}
