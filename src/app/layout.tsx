@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster"
 import Header from '@/components/header';
 
 export const metadata: Metadata = {
-  title: 'MarketGazer',
+  title: 'StockBro',
   description: 'A financial analytics dashboard for exploring stock market data and predictions.',
 };
 
