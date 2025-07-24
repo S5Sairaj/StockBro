@@ -13,13 +13,6 @@ export default function Header() {
         <ul className="flex items-center gap-4">
           <li>
             <Button variant="link" asChild>
-              <Link href="/news" className="text-primary-foreground/80 transition-colors hover:text-primary-foreground">
-                News
-              </Link>
-            </Button>
-          </li>
-          <li>
-            <Button variant="link" asChild>
               <Link href="/about" className="text-primary-foreground/80 transition-colors hover:text-primary-foreground">
                 About
               </Link>
