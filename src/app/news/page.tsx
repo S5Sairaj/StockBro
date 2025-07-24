@@ -20,7 +20,7 @@ interface NewsArticle {
 const newsCategories = [
     { value: 'market-news', label: 'Market News', query: 'market news' },
     { value: 'booming-stocks', label: 'Booming Stocks', query: 'top gaining stocks' },
-    { value: 'market-lows', label: 'Market Shuts', query: 'market shut down OR stock market crash' },
+    { value: 'indicators', label: 'Indicators', query: 'stock market technical indicators' },
 ];
 
 function NewsGrid({ articles, loading }: { articles: NewsArticle[], loading: boolean }) {
