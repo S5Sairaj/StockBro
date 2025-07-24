@@ -21,6 +21,7 @@ const newsCategories = [
     { value: 'market-news', label: 'Market News', query: 'market news' },
     { value: 'booming-stocks', label: 'Booming Stocks', query: 'top gaining stocks' },
     { value: 'indicators', label: 'Indicators', query: 'stock market technical indicators' },
+    { value: 'new-stocks-ipos', label: 'New Stocks & IPOs', query: 'new stocks IPOs' }
 ];
 
 function NewsGrid({ articles, loading }: { articles: NewsArticle[], loading: boolean }) {
