@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -31,9 +32,14 @@ export default function Header() {
     )}>
       <Link href="/" className="flex items-center gap-2">
         <CandlestickChart className="h-6 w-6 text-accent-foreground" />
-        <h1 className="text-xl font-bold tracking-tight text-accent-foreground">StockBro</h1>
+        <h1 className="text-xl font-bold tracking-tight text-accent-foreground">MarketGazer</h1>
       </Link>
       <nav className="ml-auto flex items-center gap-4">
+          <Button variant="ghost" asChild>
+            <Link href="/news" className="text-accent-foreground no-underline hover:text-accent-foreground/80 transition-colors">
+              News
+            </Link>
+          </Button>
           <Button variant="ghost" asChild>
             <Link href="/about" className="text-accent-foreground no-underline hover:text-accent-foreground/80 transition-colors">
               About

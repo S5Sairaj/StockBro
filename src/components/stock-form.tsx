@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -71,7 +72,7 @@ export default function StockForm({ onSearch, loading }: StockFormProps) {
             </ToggleGroup>
           </FormItem>
           
-          <Button type="submit" className="w-full" disabled={loading} variant="destructive">
+          <Button type="submit" className="w-full" disabled={loading}>
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

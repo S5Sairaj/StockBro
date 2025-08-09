@@ -1,3 +1,4 @@
+
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
@@ -5,7 +6,7 @@ import Header from '@/components/header';
 import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
-  title: 'StockBro',
+  title: 'MarketGazer',
   description: 'A financial analytics dashboard for exploring stock market data and predictions.',
 };
 
