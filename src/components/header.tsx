@@ -27,12 +27,12 @@ export default function Header() {
 
   return (
     <header className={cn(
-        "sticky top-0 flex h-16 items-center gap-4 bg-accent px-4 md:px-6 z-10 transition-all duration-300",
-        scrolled ? "bg-accent/90 backdrop-blur-sm border-b" : "bg-accent border-b border-transparent"
+        "sticky top-0 flex h-16 items-center gap-4 bg-[--custom-green] px-4 md:px-6 z-10 transition-all duration-300",
+        scrolled ? "bg-opacity-90 backdrop-blur-sm border-b" : "bg-opacity-100 border-b border-transparent"
     )}>
       <Link href="/" className="flex items-center gap-2">
         <CandlestickChart className="h-6 w-6 text-accent-foreground" />
-        <h1 className="text-xl font-bold tracking-tight text-accent-foreground">MarketGazer</h1>
+        <h1 className="text-xl font-bold tracking-tight text-accent-foreground">StockBro</h1>
       </Link>
       <nav className="ml-auto flex items-center gap-4">
           <Button variant="ghost" asChild>

@@ -6,7 +6,7 @@ import Header from '@/components/header';
 import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
-  title: 'MarketGazer',
+  title: 'StockBro',
   description: 'A financial analytics dashboard for exploring stock market data and predictions.',
 };
 
