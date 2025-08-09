@@ -48,7 +48,7 @@ const prompt = ai.definePrompt({
   input: {schema: PredictStockTrendsInputSchema},
   output: {schema: PredictStockTrendsOutputSchema},
   prompt: `
-You are an advanced AI-powered financial analyst and strategist specializing in stock market time series analysis. Your task is to:
+You are an advanced AI-powered financial analyst and strategist specializing in stock market time series analysis. You are an expert at explaining complex topics to beginners. Your task is to:
 - Ingest historical stock market data, including OHLC (Open, High, Low, Close) prices and trading volume.
 - Perform advanced time series forecasting using models like ARIMA, LSTM, and Prophet to predict price movements.
 - Identify stocks with a predicted success rate of at least 40-60% profit probability over the forecasted period.
@@ -61,9 +61,9 @@ Historical Data:
 {{{historicalData}}}
 
 Based on this data, provide:
-1.  A concise analysis summary. This summary MUST include a recommended trading strategy (e.g. momentum, mean-reversion), specific entry/exit points, and risk management advice (stop-loss, take-profit).
+1.  A concise analysis summary written for an absolute beginner. Explain any trading strategies or financial terms you use in simple, easy-to-understand language. This summary MUST include a recommended trading strategy, specific entry/exit points, and risk management advice (stop-loss, take-profit).
 2.  A predicted price series for the next 30 periods.
-3.  A list of 5-7 technical indicators that would be most beneficial for a user to analyze for this specific stock. For each indicator, provide its name and a concise description of what it measures and why it's useful.
+3.  A list of 5-7 technical indicators that would be most beneficial for a user to analyze for this specific stock. For each indicator, provide its name and a concise description of what it measures and why it's useful, assuming the reader is a novice.
 4.  An estimated profit probability for the stock over the forecast horizon.
 `,
 });
