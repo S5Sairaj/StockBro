@@ -71,7 +71,7 @@ export default function StockForm({ onSearch, loading }: StockFormProps) {
             </ToggleGroup>
           </FormItem>
           
-          <Button type="submit" className="w-full" disabled={loading} variant="secondary">
+          <Button type="submit" className="w-full" disabled={loading} variant="destructive">
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
