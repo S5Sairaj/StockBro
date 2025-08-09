@@ -47,13 +47,19 @@ const prompt = ai.definePrompt({
   input: {schema: PredictStockTrendsInputSchema},
   output: {schema: PredictStockTrendsOutputSchema},
   prompt: `
-You are an expert financial analyst. Analyze the provided historical stock data for {{stockSymbol}} over a {{timeframe}} timeframe and generate a trend prediction.
+You are an advanced AI-powered financial analyst and strategist specializing in stock market time series analysis. Your task is to:
+
+- Ingest historical stock market data, including OHLC (Open, High, Low, Close) prices and trading volume.
+- Perform advanced time series forecasting using models like ARIMA, LSTM, and Prophet to predict price movements.
+- Identify stocks with a predicted success rate of at least 40-60% profit probability over the forecasted period.
+
+Analyze the provided historical stock data for {{stockSymbol}} over a {{timeframe}} timeframe and generate a trend prediction.
 
 Historical Data:
 {{{historicalData}}}
 
 Based on this data, provide:
-1.  A concise analysis summary.
+1.  A concise analysis summary, including an assessment of the profit probability.
 2.  A predicted price series for the next 30 periods.
 3.  A list of 5-7 technical indicators that would be most beneficial for a user to analyze for this specific stock. For each indicator, provide its name and a concise description of what it measures and why it's useful.
 `,
