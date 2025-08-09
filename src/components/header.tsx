@@ -9,7 +9,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 z-10">
       <Link href="/" className="flex items-center gap-2 text-foreground">
-        <CandlestickChart className="h-6 w-6 text-primary" />
+        <CandlestickChart className="h-6 w-6 text-accent" />
         <h1 className="text-xl font-bold tracking-tight">StockBro</h1>
       </Link>
       <nav className="ml-auto flex items-center gap-4">
