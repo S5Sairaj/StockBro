@@ -137,12 +137,6 @@ export default function Home() {
           {!loading && stockData && stockData.prediction?.indicator_recommendations && (
             <IndicatorRecommendations indicators={stockData.prediction.indicator_recommendations} />
           )}
-
-          <TrendingStocks 
-              stocks={trendingStocks} 
-              isLoading={isTrendingLoading} 
-              onStockClick={handleTrendingClick}
-          />
         </div>
 
         <div className="md:col-span-2 lg:col-span-3">
@@ -181,11 +175,11 @@ export default function Home() {
             </div>
           )}
           {!loading && !stockData && (
-            <Card className="flex h-[550px] items-center justify-center">
-              <CardContent className="p-6 text-center text-muted-foreground">
-                <p>Enter a stock symbol to begin analysis.</p>
-              </CardContent>
-            </Card>
+             <TrendingStocks 
+              stocks={trendingStocks} 
+              isLoading={isTrendingLoading} 
+              onStockClick={handleTrendingClick}
+            />
           )}
         </div>
       </div>
