@@ -98,10 +98,10 @@ export async function getTrendingStocks() {
     const trending = quotes.map(q => ({
       symbol: q.symbol,
       name: q.longName || q.shortName || q.symbol,
-      price: q.regularMarketPrice!,
-      change: q.regularMarketChange!,
-      changePercent: q.regularMarketChangePercent!,
-    }));
+      price: q.regularMarketPrice,
+      change: q.regularMarketChange,
+      changePercent: q.regularMarketChangePercent,
+    })).filter(q => q.price !== undefined && q.price !== null && q.change !== undefined && q.change !== null && q.changePercent !== undefined && q.changePercent !== null);
 
     return trending;
 

@@ -43,34 +43,39 @@ export default function TrendingStocks({ stocks, isLoading, onStockClick }: Tren
           </div>
         ) : stocks && stocks.length > 0 ? (
           <ul className="divide-y divide-border -mx-6">
-            {stocks.map((stock) => (
-              <li 
-                key={stock.symbol} 
-                className="flex items-center justify-between p-4 px-6 hover:bg-secondary/50 cursor-pointer transition-colors"
-                onClick={() => onStockClick(stock.symbol)}
-              >
-                <div className="flex-1 pr-4 overflow-hidden">
-                  <p className="font-bold">{stock.symbol}</p>
-                  <p className="text-sm text-muted-foreground truncate">{stock.name}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold">${stock.price.toFixed(2)}</p>
-                  <div
-                    className={cn(
-                      'text-sm flex items-center justify-end gap-1',
-                      stock.change >= 0 ? 'text-green-500' : 'text-red-500'
-                    )}
-                  >
-                    {stock.change >= 0 ? (
-                      <TrendingUp className="h-4 w-4" />
-                    ) : (
-                      <TrendingDown className="h-4 w-4" />
-                    )}
-                    <span>{stock.change.toFixed(2)} ({stock.changePercent.toFixed(2)}%)</span>
+            {stocks.map((stock) => {
+              if (stock.price === undefined || stock.price === null || stock.change === undefined || stock.change === null) {
+                  return null;
+              }
+              return (
+                <li 
+                  key={stock.symbol} 
+                  className="flex items-center justify-between p-4 px-6 hover:bg-secondary/50 cursor-pointer transition-colors"
+                  onClick={() => onStockClick(stock.symbol)}
+                >
+                  <div className="flex-1 pr-4 overflow-hidden">
+                    <p className="font-bold">{stock.symbol}</p>
+                    <p className="text-sm text-muted-foreground truncate">{stock.name}</p>
                   </div>
-                </div>
-              </li>
-            ))}
+                  <div className="text-right">
+                    <p className="font-semibold">${stock.price.toFixed(2)}</p>
+                    <div
+                      className={cn(
+                        'text-sm flex items-center justify-end gap-1',
+                        stock.change >= 0 ? 'text-green-500' : 'text-red-500'
+                      )}
+                    >
+                      {stock.change >= 0 ? (
+                        <TrendingUp className="h-4 w-4" />
+                      ) : (
+                        <TrendingDown className="h-4 w-4" />
+                      )}
+                      <span>{stock.change.toFixed(2)} ({stock.changePercent.toFixed(2)}%)</span>
+                    </div>
+                  </div>
+                </li>
+              )
+            })}
           </ul>
         ) : (
             <div className="text-center text-muted-foreground p-4">
