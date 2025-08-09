@@ -1,18 +1,20 @@
+
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
-import { Line, LineChart, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer } from 'recharts';
+import { Bar, BarChart, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer, Line, ComposedChart } from 'recharts';
+import { cn } from '@/lib/utils';
+
 
 interface PriceChartProps {
-  historicalData: { date: string; price: number }[];
+  historicalData: { date: string; open: number; high: number; low: number; close: number }[];
   predictionData?: { date: string; price: number }[];
 }
 
 const chartConfig = {
   price: {
-    label: "Historical Price",
-    color: "hsl(var(--chart-1))",
+    label: "Price",
   },
   prediction: {
     label: "AI Prediction",
@@ -20,27 +22,50 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+// Custom shape for the candlestick
+const Candlestick = (props: any) => {
+    const { x, y, width, height, low, high, open, close } = props;
+    const isBullish = close > open;
+
+    const color = isBullish ? 'hsl(var(--custom-green))' : 'hsl(var(--custom-red))';
+    const wickColor = isBullish ? 'hsl(var(--custom-green))' : 'hsl(var(--custom-red))';
+    
+    return (
+        <g stroke={wickColor} fill={color} strokeWidth="1">
+            {/* Wick */}
+            <line x1={x + width / 2} y1={y} x2={x + width / 2} y2={height} />
+
+            {/* Body */}
+            <rect 
+              x={x} 
+              y={isBullish ? close : open} 
+              width={width} 
+              height={Math.abs(open - close)}
+            />
+        </g>
+    );
+};
+
+
 export default function PriceChart({ historicalData, predictionData }: PriceChartProps) {
 
-  // Map historical data for the chart
-  const mappedHistorical = historicalData.map(d => ({ date: d.date, price: d.price }));
-  
-  // Map prediction data for the chart
+  const mappedHistorical = historicalData.map(d => ({
+    date: d.date,
+    ohlc: [d.open, d.high, d.low, d.close]
+  }));
+
   const mappedPrediction = predictionData ? predictionData.map(d => ({ date: d.date, prediction: d.price })) : [];
-
-  // Combine the data for rendering
+  
   const combinedData = [...mappedHistorical];
-
+  
   mappedPrediction.forEach(pred => {
     const existingEntry = combinedData.find(d => d.date === pred.date);
     if (existingEntry) {
-      // If date exists, add prediction to it
       (existingEntry as any).prediction = pred.prediction;
     } else {
-      // If date does not exist, add a new entry
       combinedData.push({
           date: pred.date,
-          price: null,
+          ohlc: null,
           prediction: pred.prediction,
       });
     }
@@ -48,11 +73,12 @@ export default function PriceChart({ historicalData, predictionData }: PriceChar
 
   combinedData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   
+  // Calculate Y-axis domain based on min/max of high/low
   const yDomain = [
-    (dataMin: number) => Math.floor(dataMin * 0.9),
-    (dataMax: number) => Math.ceil(dataMax * 1.1)
+    (dataMin: number) => Math.floor(dataMin * 0.95),
+    (dataMax: number) => Math.ceil(dataMax * 1.05)
   ];
-
+  
   return (
     <Card>
       <CardHeader>
@@ -62,7 +88,7 @@ export default function PriceChart({ historicalData, predictionData }: PriceChar
       <CardContent>
         <ChartContainer config={chartConfig} className="h-[400px] w-full">
           <ResponsiveContainer>
-            <LineChart
+            <ComposedChart
               data={combinedData}
               margin={{ top: 5, right: 20, left: -10, bottom: 5 }}
             >
@@ -80,21 +106,37 @@ export default function PriceChart({ historicalData, predictionData }: PriceChar
                 tickLine={{ stroke: 'hsl(var(--muted-foreground))' }}
                 axisLine={{ stroke: 'hsl(var(--border))' }}
                 tickFormatter={(value) => `$${value}`}
+                orientation="left"
               />
               <ChartTooltip
                 cursor={{ stroke: 'hsl(var(--muted-foreground))' }}
-                content={<ChartTooltipContent indicator="dot" />}
+                content={({ active, payload, label }) => {
+                    if (active && payload && payload.length) {
+                        const data = payload[0].payload;
+                        const ohlc = data.ohlc;
+                        const prediction = data.prediction;
+                        const color = ohlc && ohlc[3] > ohlc[0] ? 'text-green-500' : 'text-red-500';
+
+                        return (
+                        <div className="p-2 text-xs bg-background border rounded-lg shadow-lg">
+                            <p className="font-bold">{new Date(label).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
+                             {ohlc && <>
+                                <p className={cn(color)}>Open: ${ohlc[0]?.toFixed(2)}</p>
+                                <p className={cn(color)}>High: ${ohlc[1]?.toFixed(2)}</p>
+                                <p className={cn(color)}>Low: ${ohlc[2]?.toFixed(2)}</p>
+                                <p className={cn(color)}>Close: ${ohlc[3]?.toFixed(2)}</p>
+                             </>}
+                             {prediction && <p className="text-[hsl(var(--chart-2))]">Prediction: ${prediction?.toFixed(2)}</p>}
+                        </div>
+                        );
+                    }
+                    return null;
+                }}
               />
               <Legend />
-              <Line
-                type="monotone"
-                dataKey="price"
-                stroke={chartConfig.price.color}
-                strokeWidth={2}
-                dot={false}
-                connectNulls={false}
-                name="Historical"
-              />
+
+              <Bar dataKey="ohlc" name="Price" fill="hsl(var(--chart-1))" shape={<Candlestick />} />
+
               <Line
                 type="monotone"
                 dataKey="prediction"
@@ -105,7 +147,7 @@ export default function PriceChart({ historicalData, predictionData }: PriceChar
                 connectNulls={false}
                 name="Prediction"
               />
-            </LineChart>
+            </ComposedChart>
           </ResponsiveContainer>
         </ChartContainer>
       </CardContent>

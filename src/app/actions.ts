@@ -55,7 +55,10 @@ export async function getStockData(symbol: string, timeframe: string) {
 
         const historical = history.map(d => ({
             date: d.date.toISOString().split('T')[0],
-            price: parseFloat(d.close.toFixed(2)),
+            open: d.open,
+            high: d.high,
+            low: d.low,
+            close: d.close,
         }));
         
         return { details, historical };

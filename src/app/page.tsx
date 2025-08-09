@@ -18,9 +18,17 @@ import { useAuth } from '@/hooks/use-auth';
 
 const stockSymbolSchema = z.string().min(1, 'Stock symbol is required.').max(5, 'Stock symbol must be 5 characters or less.');
 
+type HistoricalData = {
+  date: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+};
+
 type StockData = {
   details: any;
-  historical: any[];
+  historical: HistoricalData[];
   prediction?: {
       predicted_series: {
           dates: string[];
@@ -75,7 +83,7 @@ export default function Home() {
         throw new Error("No historical data found. The stock symbol may be delisted or invalid for the selected timeframe.");
       }
       
-      const historicalDataCsv = `date,price\n${historical.map(d => `${d.date},${d.price}`).join('\n')}`;
+      const historicalDataCsv = `date,open,high,low,close\n${historical.map(d => `${d.date},${d.open},${d.high},${d.low},${d.close}`).join('\n')}`;
       
       const predictionResult = await predictStockTrends({
         stockSymbol: symbol.toUpperCase(),
