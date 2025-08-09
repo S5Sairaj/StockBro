@@ -26,8 +26,8 @@ export default function AddToPortfolio({ symbol }: AddToPortfolioProps) {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            quantity: '' as any,
-            purchasePrice: '' as any,
+            quantity: '',
+            purchasePrice: '',
         },
     });
 
@@ -42,8 +42,8 @@ export default function AddToPortfolio({ symbol }: AddToPortfolioProps) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Add to Portfolio</CardTitle>
-                <CardDescription>Add or update your holdings for {symbol}.</CardDescription>
+                <CardTitle>Track Holdings for {symbol}</CardTitle>
+                <CardDescription>This is for tracking purposes only. No real stocks are purchased.</CardDescription>
             </CardHeader>
             <CardContent>
                 <Form {...form}>
