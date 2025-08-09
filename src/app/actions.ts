@@ -1,3 +1,4 @@
+
 'use server';
 
 import yahooFinance from 'yahoo-finance2';
@@ -123,8 +124,29 @@ async function getArticleContent(url: string): Promise<string> {
     }
     const html = await response.text();
     const dom = new JSDOM(html);
-    const reader = new dom.window.document.querySelector('article, .caas-body'); // Common selectors for article bodies
-    return reader ? reader.textContent || '' : '';
+    const document = dom.window.document;
+    
+    // Try common selectors for article bodies
+    const selectors = ['article', '.caas-body', '.article-body', '#story-body', '.story-content'];
+    let articleBody: Element | null = null;
+    for (const selector of selectors) {
+        articleBody = document.querySelector(selector);
+        if (articleBody) break;
+    }
+
+    if (articleBody) {
+        return articleBody.textContent || '';
+    }
+
+    // Fallback: If no specific container is found, gather all paragraph text
+    const paragraphs = document.querySelectorAll('p');
+    let text = '';
+    paragraphs.forEach(p => {
+        text += p.textContent + '\n';
+    });
+    
+    return text.trim();
+
   } catch (error) {
     console.error('Error fetching article content:', error);
     return 'Could not retrieve article content.';
@@ -133,8 +155,8 @@ async function getArticleContent(url: string): Promise<string> {
 
 export async function summarizeNewsArticle(url: string) {
     const articleText = await getArticleContent(url);
-    if (!articleText || articleText === 'Could not retrieve article content.') {
-        return { summary: "Could not retrieve the article content to summarize.", impact: "N/A" };
+    if (!articleText || articleText.trim().length < 100) { // Check for minimal content length
+        return { summary: "Could not retrieve enough article content to summarize.", impact: "N/A" };
     }
     return await summarizeNews({ article: articleText });
 }
