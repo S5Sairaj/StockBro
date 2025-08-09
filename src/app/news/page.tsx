@@ -1,12 +1,20 @@
-
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { getNews } from '@/app/actions';
+import { getNews, summarizeNewsArticle } from '@/app/actions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Loader2, BookOpen } from 'lucide-react';
 
 type NewsItem = {
   uuid: string;
@@ -28,6 +36,9 @@ const newsCategories = [
 function NewsList({ category }: { category: string }) {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [summarizing, setSummarizing] = useState(false);
+  const [summary, setSummary] = useState<{ summary: string, impact: string } | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -40,6 +51,15 @@ function NewsList({ category }: { category: string }) {
     fetchNews();
   }, [category]);
 
+  const handleSummarize = async (url: string) => {
+    setSummarizing(true);
+    setSummary(null);
+    setIsDialogOpen(true);
+    const result = await summarizeNewsArticle(url);
+    setSummary(result);
+    setSummarizing(false);
+  }
+
   if (loading) {
     return (
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -48,7 +68,7 @@ function NewsList({ category }: { category: string }) {
             <CardHeader>
               <Skeleton className="h-[150px] w-full rounded-md" />
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="p-4 space-y-2">
               <Skeleton className="h-4 w-3/4" />
               <Skeleton className="h-4 w-1/2" />
               <Skeleton className="h-4 w-1/4" />
@@ -60,30 +80,69 @@ function NewsList({ category }: { category: string }) {
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {news.map((item) => (
-        <a href={item.link} key={item.uuid} target="_blank" rel="noopener noreferrer" className="block hover:opacity-80 transition-opacity">
-          <Card className="h-full overflow-hidden">
-            <CardHeader className="p-0">
-              {item.thumbnail && (
-                 <Image
-                    src={item.thumbnail}
-                    alt={item.title}
-                    width={400}
-                    height={225}
-                    className="aspect-video w-full object-cover"
-                    data-ai-hint="news article"
-                  />
-              )}
-            </CardHeader>
-            <CardContent className="p-4 space-y-2">
-              <p className="text-sm font-semibold leading-tight">{item.title}</p>
-              <p className="text-xs text-muted-foreground">{item.publisher} &bull; {item.providerPublishTime}</p>
-            </CardContent>
+    <>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {news.map((item) => (
+          <Card key={item.uuid} className="h-full overflow-hidden flex flex-col">
+            <a href={item.link} target="_blank" rel="noopener noreferrer" className="block hover:opacity-80 transition-opacity">
+              <CardHeader className="p-0">
+                {item.thumbnail ? (
+                  <Image
+                      src={item.thumbnail}
+                      alt={item.title}
+                      width={400}
+                      height={225}
+                      className="aspect-video w-full object-cover"
+                      data-ai-hint="news article"
+                    />
+                ) : (
+                  <div className="aspect-video w-full bg-secondary flex items-center justify-center">
+                    <BookOpen className="w-12 h-12 text-muted-foreground" />
+                  </div>
+                )}
+              </CardHeader>
+              <CardContent className="p-4 space-y-2 flex-grow">
+                <p className="text-sm font-semibold leading-tight">{item.title}</p>
+                <p className="text-xs text-muted-foreground">{item.publisher} &bull; {item.providerPublishTime}</p>
+              </CardContent>
+            </a>
+            <div className="p-4 pt-0">
+                <Button variant="secondary" className="w-full" onClick={() => handleSummarize(item.link)}>
+                    Summarize
+                </Button>
+            </div>
           </Card>
-        </a>
-      ))}
-    </div>
+        ))}
+      </div>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent>
+              <DialogHeader>
+                  <DialogTitle>AI News Summary</DialogTitle>
+                  <DialogDescription>
+                      This summary and analysis is generated by AI and may not be fully accurate.
+                  </DialogDescription>
+              </DialogHeader>
+              {summarizing ? (
+                  <div className="flex items-center justify-center p-8">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+              ) : (
+                  summary && (
+                      <div className="space-y-4 text-sm">
+                          <div>
+                              <h3 className="font-semibold mb-2">Summary</h3>
+                              <p className="text-muted-foreground">{summary.summary}</p>
+                          </div>
+                          <div>
+                              <h3 className="font-semibold mb-2">Potential Market Impact</h3>
+                              <p className="text-muted-foreground">{summary.impact}</p>
+                          </div>
+                      </div>
+                  )
+              )}
+          </DialogContent>
+      </Dialog>
+    </>
   );
 }
 

@@ -152,6 +152,10 @@ export default function Home() {
                 description={stockData.details.description}
                 analysis={stockData.analysis}
                 profitProbability={stockData.prediction?.profit_probability}
+                marketCap={stockData.details.marketCap}
+                peRatio={stockData.details.peRatio}
+                dividendYield={stockData.details.dividendYield}
+                analystRecommendation={stockData.details.analystRecommendation}
               />
               <PriceChart 
                 historicalData={stockData.historical} 

@@ -1,6 +1,10 @@
 'use server';
 
 import yahooFinance from 'yahoo-finance2';
+import jsdom from 'jsdom';
+import { summarizeNews } from '@/ai/flows/summarize-news-flow';
+
+const { JSDOM } = jsdom;
 
 function getStartDate(timeframe: string): Date {
     const now = new Date();
@@ -25,10 +29,13 @@ export async function getStockData(symbol: string, timeframe: string) {
             interval: (timeframe === 'weekly' ? '1wk' : timeframe === 'monthly' ? '1mo' : '1d') as '1d' | '1wk' | '1mo',
         };
         
-        const [quote, history, summary] = await Promise.all([
+        const summary = await yahooFinance.quoteSummary(symbol, {
+             modules: ["summaryProfile", "summaryDetail", "financialData", "price"] 
+        });
+
+        const [quote, history] = await Promise.all([
              yahooFinance.quote(symbol),
              yahooFinance.historical(symbol, queryOptions),
-             yahooFinance.quoteSummary(symbol, { modules: ["summaryProfile"] })
         ]);
 
         if (!quote) {
@@ -39,6 +46,10 @@ export async function getStockData(symbol: string, timeframe: string) {
             name: quote.longName || `${symbol.toUpperCase()} Company`,
             description: summary.summaryProfile?.longBusinessSummary || `Description for ${symbol.toUpperCase()}.`,
             exchange: quote.fullExchangeName || 'N/A',
+            marketCap: summary.summaryDetail?.marketCap,
+            peRatio: summary.summaryDetail?.trailingPE,
+            dividendYield: summary.summaryDetail?.dividendYield,
+            analystRecommendation: summary.financialData?.recommendationKey,
         };
 
         const historical = history.map(d => ({
@@ -102,4 +113,28 @@ export async function getNews(query: string = 'market news') {
         console.error(`Failed to fetch news for query "${query}":`, error);
         return [];
     }
+}
+
+async function getArticleContent(url: string): Promise<string> {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch article: ${response.statusText}`);
+    }
+    const html = await response.text();
+    const dom = new JSDOM(html);
+    const reader = new dom.window.document.querySelector('article, .caas-body'); // Common selectors for article bodies
+    return reader ? reader.textContent || '' : '';
+  } catch (error) {
+    console.error('Error fetching article content:', error);
+    return 'Could not retrieve article content.';
+  }
+}
+
+export async function summarizeNewsArticle(url: string) {
+    const articleText = await getArticleContent(url);
+    if (!articleText || articleText === 'Could not retrieve article content.') {
+        return { summary: "Could not retrieve the article content to summarize.", impact: "N/A" };
+    }
+    return await summarizeNews({ article: articleText });
 }

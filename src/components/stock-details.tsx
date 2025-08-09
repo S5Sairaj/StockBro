@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,9 +16,33 @@ interface StockDetailsProps {
   description?: string;
   analysis?: string;
   profitProbability?: number;
+  marketCap?: number;
+  peRatio?: number;
+  dividendYield?: number;
+  analystRecommendation?: string;
 }
 
-export default function StockDetails({ symbol, name, exchange, description, analysis, profitProbability }: StockDetailsProps) {
+function formatMarketCap(value: number) {
+  if (value >= 1e12) return `${(value / 1e12).toFixed(2)}T`;
+  if (value >= 1e9) return `${(value / 1e9).toFixed(2)}B`;
+  if (value >= 1e6) return `${(value / 1e6).toFixed(2)}M`;
+  return value.toString();
+}
+
+const StatCard = ({ label, value }: { label: string, value: string | number | undefined }) => {
+    if (value === undefined || value === null || value === 'none') return null;
+    return (
+        <div className="flex flex-col space-y-1 rounded-lg border p-3">
+            <p className="text-xs text-muted-foreground">{label}</p>
+            <p className="text-sm font-bold">{value}</p>
+        </div>
+    );
+};
+
+export default function StockDetails({ 
+  symbol, name, exchange, description, analysis, profitProbability,
+  marketCap, peRatio, dividendYield, analystRecommendation
+}: StockDetailsProps) {
   const { user } = useAuth();
   const { watchlist, addToWatchlist, removeFromWatchlist } = useWatchlist();
   const isInWatchlist = watchlist.includes(symbol);
@@ -62,7 +85,20 @@ export default function StockDetails({ symbol, name, exchange, description, anal
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {description && <p className="text-sm text-muted-foreground">{description}</p>}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <StatCard label="Market Cap" value={marketCap ? formatMarketCap(marketCap) : 'N/A'} />
+            <StatCard label="P/E Ratio" value={peRatio ? peRatio.toFixed(2) : 'N/A'} />
+            <StatCard label="Dividend Yield" value={dividendYield ? `${(dividendYield * 100).toFixed(2)}%` : 'N/A'} />
+            <StatCard label="Analyst Consensus" value={analystRecommendation ? analystRecommendation.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'N/A'} />
+        </div>
+        
+        {description && (
+            <>
+                <Separator />
+                <p className="text-sm text-muted-foreground">{description}</p>
+            </>
+        )}
+
         {analysis && (
           <>
             <Separator />
