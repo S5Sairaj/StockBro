@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -61,7 +62,7 @@ export default function StockDetails({
         <div className="flex justify-between items-start">
           <div>
             <CardTitle>{name} ({symbol})</CardTitle>
-            <CardDescription>{exchange}</CardDescription>
+            <CardDescription>{exchange} - Data is delayed.</CardDescription>
           </div>
           <div className="flex items-center gap-2">
             {profitProbability !== undefined && (
