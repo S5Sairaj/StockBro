@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
 import { useWatchlist } from '@/hooks/use-watchlist';
 import { TrendingUp, Star } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface StockDetailsProps {
   symbol: string;
