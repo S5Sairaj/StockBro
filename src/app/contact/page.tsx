@@ -116,7 +116,7 @@ export default function ContactPage() {
                     <Card>
                         <CardHeader>
                             <CardTitle>Contact Information</CardTitle>
-                        </Header>
+                        </CardHeader>
                         <CardContent className="space-y-4 text-muted-foreground">
                             <div className="flex items-center gap-4">
                                 <Mail className="w-5 h-5 text-primary" />
