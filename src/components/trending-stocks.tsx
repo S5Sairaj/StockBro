@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Skeleton } from '@/components/ui/skeleton';
 import { TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from './ui/button';
 
 interface Stock {
   symbol: string;
@@ -43,7 +42,7 @@ export default function TrendingStocks({ stocks, isLoading, onStockClick }: Tren
                 </div>
             ))}
           </div>
-        ) : stocks.length > 0 ? (
+        ) : stocks && stocks.length > 0 ? (
           <ul className="divide-y divide-border -mx-6">
             {stocks.map((stock) => (
               <li 
@@ -51,7 +50,7 @@ export default function TrendingStocks({ stocks, isLoading, onStockClick }: Tren
                 className="flex items-center justify-between p-4 px-6 hover:bg-secondary/50 cursor-pointer transition-colors"
                 onClick={() => onStockClick(stock.symbol)}
               >
-                <div className="flex-1 pr-4">
+                <div className="flex-1 pr-4 overflow-hidden">
                   <p className="font-bold">{stock.symbol}</p>
                   <p className="text-sm text-muted-foreground truncate">{stock.name}</p>
                 </div>
@@ -77,7 +76,8 @@ export default function TrendingStocks({ stocks, isLoading, onStockClick }: Tren
         ) : (
             <div className="text-center text-muted-foreground p-4">
               <AlertTriangle className="mx-auto h-8 w-8 text-yellow-500 mb-2" />
-              <p className="text-sm">Could not load trending stocks at this time.</p>
+              <p className="text-sm font-semibold">Could not load trending stocks</p>
+              <p className="text-xs">This can happen sometimes. Please try again later.</p>
             </div>
         )}
       </CardContent>

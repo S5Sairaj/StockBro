@@ -39,8 +39,8 @@ export async function getStockData(symbol: string, timeframe: string) {
              yahooFinance.historical(symbol, queryOptions),
         ]);
 
-        if (!quote) {
-            throw new Error(`Invalid stock symbol: ${symbol}`);
+        if (!quote || !history || history.length === 0) {
+             throw new Error(`No data found for symbol: ${symbol}. It may be delisted or invalid.`);
         }
 
         const details = {
@@ -65,7 +65,7 @@ export async function getStockData(symbol: string, timeframe: string) {
     } catch (error: any) {
         console.error('Failed to fetch stock data for', symbol, error.message);
         if (error.message && (error.message.includes('404') || error.message.includes('No data'))) {
-             throw new Error(`Could not find stock data for symbol: ${symbol}. It may be an invalid symbol.`);
+             throw new Error(`Could not find stock data for symbol: ${symbol}. Please check if the symbol is correct.`);
         }
         throw new Error('An external service error occurred while fetching stock data.');
     }
@@ -73,50 +73,41 @@ export async function getStockData(symbol: string, timeframe: string) {
 
 
 export async function getTrendingStocks() {
-    try {
-        // Fetch trending stocks for multiple regions to increase chances of getting data
-        const regions = ['US', 'GB', 'IN', 'CA'];
-        let quotes: any[] = [];
-        for (const region of regions) {
-            const result = await yahooFinance.trendingSymbols(region, { count: 10 });
-            if (result.quotes) {
-                quotes.push(...result.quotes);
+    const regions = ['US', 'GB', 'IN', 'CA', 'AU', 'DE', 'HK'];
+    for (const region of regions) {
+        try {
+            const result = await yahooFinance.trendingSymbols(region, { count: 15 });
+            if (result && result.quotes) {
+                const uniqueSymbols = new Set();
+                const trending = result.quotes.filter(q => {
+                    const isEquity = q.quoteType === 'EQUITY';
+                    const hasPrice = typeof q.regularMarketPrice === 'number';
+                    const hasChange = typeof q.regularMarketChange === 'number';
+                    const isUnique = !uniqueSymbols.has(q.symbol);
+                    if (isEquity && hasPrice && hasChange && isUnique) {
+                        uniqueSymbols.add(q.symbol);
+                        return true;
+                    }
+                    return false;
+                }).map(q => ({
+                    symbol: q.symbol,
+                    name: q.longName || q.shortName || q.symbol,
+                    price: q.regularMarketPrice!,
+                    change: q.regularMarketChange!,
+                    changePercent: q.regularMarketChangePercent!,
+                }));
+
+                if (trending.length >= 5) {
+                    return trending.slice(0, 5);
+                }
             }
+        } catch (error) {
+            console.warn(`Could not fetch trending stocks for region ${region}:`, error);
         }
-        
-        const uniqueSymbols = new Set();
-
-        const trending = quotes.filter(q => {
-            const isEquity = q.quoteType === 'EQUITY';
-            const hasPrice = typeof q.regularMarketPrice === 'number';
-            const hasChange = typeof q.regularMarketChange === 'number';
-            const isUnique = !uniqueSymbols.has(q.symbol);
-            if(isEquity && hasPrice && hasChange && isUnique) {
-                uniqueSymbols.add(q.symbol);
-                return true;
-            }
-            return false;
-        }).slice(0, 5).map(q => ({
-            symbol: q.symbol,
-            name: q.longName || q.shortName || q.symbol,
-            price: q.regularMarketPrice || 0,
-            change: q.regularMarketChange || 0,
-            changePercent: q.regularMarketChangePercent || 0,
-        }));
-
-        if (trending.length === 0) {
-            console.warn("Could not fetch any trending stocks.");
-        }
-
-        return trending;
-    } catch (error) {
-        if (error instanceof Error) {
-            console.error('Failed to fetch trending stocks:', error.message);
-        } else {
-            console.error('An unknown error occurred while fetching trending stocks:', error);
-        }
-        return [];
     }
+    
+    console.error('Failed to fetch trending stocks from any region.');
+    return []; // Return empty if no region was successful
 }
 
 export async function getNews(query: string = 'market news') {
@@ -147,7 +138,7 @@ async function getArticleContent(url: string): Promise<string> {
     const document = dom.window.document;
     
     // Try common selectors for article bodies
-    const selectors = ['article', '.caas-body', '.article-body', '#story-body', '.story-content'];
+    const selectors = ['article', '.caas-body', '.article-body', '#story-body', '.story-content', 'div[data-component="Component-Caas-Content"]'];
     let articleBody: Element | null = null;
     for (const selector of selectors) {
         articleBody = document.querySelector(selector);
@@ -155,27 +146,37 @@ async function getArticleContent(url: string): Promise<string> {
     }
 
     if (articleBody) {
+        // Remove known noise from the article body before extracting text
+        articleBody.querySelectorAll('figure, .ad, .related-content, .player-unavailable').forEach(el => el.remove());
         return articleBody.textContent || '';
     }
 
-    // Fallback: If no specific container is found, gather all paragraph text
-    const paragraphs = document.querySelectorAll('p');
+    // Fallback: If no specific container is found, gather all paragraph text from the body
+    const paragraphs = document.body.querySelectorAll('p');
     let text = '';
     paragraphs.forEach(p => {
-        text += p.textContent + '\n';
+        // Simple filter to avoid boilerplate/ad text
+        if (p.textContent && p.textContent.length > 80) {
+            text += p.textContent + '\n';
+        }
     });
     
-    return text.trim();
+    if (text.trim().length > 100) {
+      return text.trim();
+    }
+    
+    // If still nothing, return a more specific message.
+    return "Could not retrieve the article content to summarize.";
 
   } catch (error) {
     console.error('Error fetching article content:', error);
-    return 'Could not retrieve article content.';
+    return 'Could not retrieve the article content to summarize.';
   }
 }
 
 export async function summarizeNewsArticle(url: string) {
     const articleText = await getArticleContent(url);
-    if (!articleText || articleText.trim().length < 100) { // Check for minimal content length
+    if (!articleText || articleText.trim().length < 100 || articleText === "Could not retrieve the article content to summarize.") {
         return { summary: "Could not retrieve enough article content to summarize.", impact: "N/A" };
     }
     return await summarizeNews({ article: articleText });
