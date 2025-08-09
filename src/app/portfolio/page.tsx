@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRequireAuth } from '@/hooks/use-auth';
 import { usePortfolio, PortfolioItem } from '@/hooks/use-portfolio';
 import { getStockData } from '@/app/actions';
@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { Trash2, TrendingUp, TrendingDown } from 'lucide-react';
+import { Trash2, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
@@ -28,11 +28,39 @@ function formatCurrency(value: number) {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
 }
 
+const StatCard = ({ label, value, valueClass, icon, description, descriptionClass }: { label: string, value: string, valueClass?: string, icon?: React.ReactNode, description?: string, descriptionClass?: string }) => (
+    <div className="flex flex-col space-y-1 rounded-lg border p-3">
+        <p className="text-xs text-muted-foreground flex items-center gap-1">{icon}{label}</p>
+        <p className={cn("text-lg font-bold", valueClass)}>{value}</p>
+        {description && <p className={cn("text-xs", descriptionClass)}>{description}</p>}
+    </div>
+);
+
+
 export default function PortfolioPage() {
     const { user } = useRequireAuth();
     const { portfolio, removeFromPortfolio, isLoaded } = usePortfolio();
     const [stocks, setStocks] = useState<PortfolioStock[]>([]);
     const [loading, setLoading] = useState(true);
+
+     const portfolioSummary = useMemo(() => {
+        if (!stocks || stocks.length === 0) {
+            return {
+                totalValue: 0,
+                totalCost: 0,
+                totalGainLoss: 0,
+                totalGainLossPercent: 0,
+            };
+        }
+
+        const totalValue = stocks.reduce((acc, stock) => acc + stock.totalValue, 0);
+        const totalCost = stocks.reduce((acc, stock) => acc + stock.totalCost, 0);
+        const totalGainLoss = totalValue - totalCost;
+        const totalGainLossPercent = totalCost !== 0 ? (totalGainLoss / totalCost) * 100 : 0;
+
+        return { totalValue, totalCost, totalGainLoss, totalGainLossPercent };
+    }, [stocks]);
+
 
     useEffect(() => {
         if (!isLoaded || !user) return;
@@ -88,11 +116,54 @@ export default function PortfolioPage() {
     if (!user) {
         return null;
     }
+    
+    const { totalValue, totalCost, totalGainLoss, totalGainLossPercent } = portfolioSummary;
+    const gainLossColor = totalGainLoss >= 0 ? "text-green-500" : "text-red-500";
+    const gainLossIcon = totalGainLoss === 0 ? <Minus className="h-4 w-4" /> : totalGainLoss > 0 ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />;
+
 
     return (
         <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-            <div className="max-w-6xl mx-auto">
-                <h2 className="text-3xl font-bold tracking-tight mb-6">My Portfolio</h2>
+            <div className="max-w-6xl mx-auto space-y-6">
+                <div>
+                    <h2 className="text-3xl font-bold tracking-tight">My Portfolio</h2>
+                    <p className="text-muted-foreground">An overview of your investment performance.</p>
+                </div>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Portfolio Summary</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {loading ? (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <Skeleton className="h-[90px] w-full" />
+                                <Skeleton className="h-[90px] w-full" />
+                                <Skeleton className="h-[90px] w-full" />
+                            </div>
+                        ) : (
+                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                               <StatCard 
+                                    label="Total Market Value"
+                                    value={formatCurrency(totalValue)}
+                               />
+                               <StatCard 
+                                    label="Total Gain/Loss"
+                                    value={formatCurrency(totalGainLoss)}
+                                    valueClass={gainLossColor}
+                                    icon={gainLossIcon}
+                                    description={`${totalGainLossPercent.toFixed(2)}%`}
+                                    descriptionClass={gainLossColor}
+
+                               />
+                               <StatCard 
+                                    label="Total Cost Basis"
+                                    value={formatCurrency(totalCost)}
+                               />
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
 
                 <Card>
                     <CardHeader>
