@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -24,8 +23,8 @@ export default function TrendingStocks({ stocks, isLoading, onStockClick }: Tren
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Trending Stocks</CardTitle>
-        <CardDescription>Market leaders and top movers.</CardDescription>
+        <CardTitle>Featured Stocks</CardTitle>
+        <CardDescription>A selection of S&P 500 companies.</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -76,7 +75,7 @@ export default function TrendingStocks({ stocks, isLoading, onStockClick }: Tren
         ) : (
             <div className="text-center text-muted-foreground p-4">
               <AlertTriangle className="mx-auto h-8 w-8 text-yellow-500 mb-2" />
-              <p className="text-sm font-semibold">Could not load trending stocks</p>
+              <p className="text-sm font-semibold">Could not load featured stocks</p>
               <p className="text-xs">This can happen sometimes. Please try again later.</p>
             </div>
         )}

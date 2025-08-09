@@ -1,4 +1,3 @@
-
 'use server';
 
 import yahooFinance from 'yahoo-finance2';
@@ -73,41 +72,43 @@ export async function getStockData(symbol: string, timeframe: string) {
 
 
 export async function getTrendingStocks() {
-    const regions = ['US', 'GB', 'IN', 'CA', 'AU', 'DE', 'HK'];
-    for (const region of regions) {
-        try {
-            const result = await yahooFinance.trendingSymbols(region, { count: 15 });
-            if (result && result.quotes) {
-                const uniqueSymbols = new Set();
-                const trending = result.quotes.filter(q => {
-                    const isEquity = q.quoteType === 'EQUITY';
-                    const hasPrice = typeof q.regularMarketPrice === 'number';
-                    const hasChange = typeof q.regularMarketChange === 'number';
-                    const isUnique = !uniqueSymbols.has(q.symbol);
-                    if (isEquity && hasPrice && hasChange && isUnique) {
-                        uniqueSymbols.add(q.symbol);
-                        return true;
-                    }
-                    return false;
-                }).map(q => ({
-                    symbol: q.symbol,
-                    name: q.longName || q.shortName || q.symbol,
-                    price: q.regularMarketPrice!,
-                    change: q.regularMarketChange!,
-                    changePercent: q.regularMarketChangePercent!,
-                }));
-
-                if (trending.length >= 5) {
-                    return trending.slice(0, 5);
-                }
-            }
-        } catch (error) {
-            console.warn(`Could not fetch trending stocks for region ${region}:`, error);
-        }
-    }
+  const S_AND_P_500_URL = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies';
+  
+  try {
+    const response = await fetch(S_AND_P_500_URL);
+    const html = await response.text();
+    const dom = new JSDOM(html);
+    const document = dom.window.document;
+    const table = document.querySelector('#constituents');
     
-    console.error('Failed to fetch trending stocks from any region.');
-    return []; // Return empty if no region was successful
+    if (!table) {
+      console.error("Could not find S&P 500 constituents table.");
+      return [];
+    }
+
+    const symbols = Array.from(table.querySelectorAll('tbody tr')).slice(1).map(row => {
+      return row.querySelector('td:first-child a')?.textContent?.trim();
+    }).filter((s): s is string => !!s);
+    
+    // Get 5 random unique symbols
+    const randomSymbols = [...new Set(symbols)].sort(() => 0.5 - Math.random()).slice(0, 5);
+
+    const quotes = await yahooFinance.quote(randomSymbols);
+    
+    const trending = quotes.map(q => ({
+      symbol: q.symbol,
+      name: q.longName || q.shortName || q.symbol,
+      price: q.regularMarketPrice!,
+      change: q.regularMarketChange!,
+      changePercent: q.regularMarketChangePercent!,
+    }));
+
+    return trending;
+
+  } catch (error) {
+    console.error('Failed to fetch S&P 500 tickers:', error);
+    return [];
+  }
 }
 
 export async function getNews(query: string = 'market news') {
