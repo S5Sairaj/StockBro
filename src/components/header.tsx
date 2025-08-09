@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -35,7 +34,7 @@ export default function Header() {
     )}>
       <Link href="/" className="flex items-center gap-2">
         <CandlestickChart className="h-6 w-6 text-primary" />
-        <h1 className="text-xl font-bold tracking-tight text-foreground">MarketGazer</h1>
+        <h1 className="text-xl font-bold tracking-tight text-foreground">StockBro</h1>
       </Link>
       <nav className="ml-auto flex items-center gap-4">
           <Button variant="ghost" asChild>

@@ -116,11 +116,11 @@ export default function ContactPage() {
                     <Card>
                         <CardHeader>
                             <CardTitle>Contact Information</CardTitle>
-                        </CardHeader>
+                        </Header>
                         <CardContent className="space-y-4 text-muted-foreground">
                             <div className="flex items-center gap-4">
                                 <Mail className="w-5 h-5 text-primary" />
-                                <a href="mailto:support@marketgazer.com" className="hover:text-primary">support@marketgazer.com</a>
+                                <a href="mailto:support@stockbro.com" className="hover:text-primary">support@stockbro.com</a>
                             </div>
                              <div className="flex items-center gap-4">
                                 <Phone className="w-5 h-5 text-primary" />

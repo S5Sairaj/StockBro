@@ -7,7 +7,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from '@/hooks/use-auth';
 
 export const metadata: Metadata = {
-  title: 'MarketGazer',
+  title: 'StockBro',
   description: 'A financial analytics dashboard for exploring stock market data and predictions.',
 };
 

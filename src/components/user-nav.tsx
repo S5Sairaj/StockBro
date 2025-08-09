@@ -19,6 +19,7 @@ import {
 import { signOut, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface UserNavProps {
     user: User;
@@ -60,6 +61,9 @@ export function UserNav({ user }: UserNavProps) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
+          <DropdownMenuItem asChild>
+            <Link href="/watchlist">Watchlist</Link>
+          </DropdownMenuItem>
           <DropdownMenuItem>
             Profile
           </DropdownMenuItem>
