@@ -18,6 +18,10 @@ type PortfolioStock = PortfolioItem & {
     currentPrice: number;
     change: number;
     changePercent: number;
+    totalValue: number;
+    totalCost: number;
+    totalGainLoss: number;
+    totalGainLossPercent: number;
 };
 
 function formatCurrency(value: number) {
@@ -44,19 +48,27 @@ export default function PortfolioPage() {
             const stockDataPromises = portfolio.map(async (item) => {
                 try {
                     const data = await getStockData(item.symbol, 'daily');
-                    // Get the latest two days to calculate change
                     const lastTwo = data.historical.slice(-2);
                     const currentPrice = lastTwo.length > 1 ? lastTwo[1].close : lastTwo[0]?.close || 0;
                     const prevPrice = lastTwo.length > 1 ? lastTwo[0].close : currentPrice;
                     const change = currentPrice - prevPrice;
                     const changePercent = prevPrice !== 0 ? (change / prevPrice) * 100 : 0;
                     
+                    const totalCost = item.quantity * item.purchasePrice;
+                    const totalValue = item.quantity * currentPrice;
+                    const totalGainLoss = totalValue - totalCost;
+                    const totalGainLossPercent = totalCost !== 0 ? (totalGainLoss / totalCost) * 100 : 0;
+
                     return {
                         ...item,
                         name: data.details.name,
                         currentPrice,
                         change,
-                        changePercent
+                        changePercent,
+                        totalValue,
+                        totalCost,
+                        totalGainLoss,
+                        totalGainLossPercent,
                     };
                 } catch (error) {
                     console.error(`Failed to fetch data for ${item.symbol}`, error);
@@ -94,8 +106,10 @@ export default function PortfolioPage() {
                                     <TableRow>
                                         <TableHead>Symbol</TableHead>
                                         <TableHead>Quantity</TableHead>
-                                        <TableHead className="text-right">Avg. Cost</TableHead>
-                                        <TableHead className="text-right">Current Price</TableHead>
+                                        <TableHead>Avg. Cost</TableHead>
+                                        <TableHead>Current Price</TableHead>
+                                        <TableHead>Market Value</TableHead>
+                                        <TableHead>Total Gain/Loss</TableHead>
                                         <TableHead className="text-right">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -104,8 +118,10 @@ export default function PortfolioPage() {
                                         <TableRow key={i}>
                                             <TableCell><Skeleton className="h-5 w-32" /></TableCell>
                                             <TableCell><Skeleton className="h-5 w-16" /></TableCell>
-                                            <TableCell className="text-right"><Skeleton className="h-5 w-20 ml-auto" /></TableCell>
-                                            <TableCell className="text-right"><Skeleton className="h-5 w-20 ml-auto" /></TableCell>
+                                            <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                                            <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                                            <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                                            <TableCell><Skeleton className="h-5 w-24" /></TableCell>
                                             <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
                                         </TableRow>
                                     ))}
@@ -116,10 +132,12 @@ export default function PortfolioPage() {
                             <Table>
                                 <TableHeader>
                                      <TableRow>
-                                        <TableHead>Symbol</TableHead>
+                                        <TableHead className="w-[180px]">Symbol</TableHead>
                                         <TableHead>Quantity</TableHead>
-                                        <TableHead className="text-right">Avg. Cost</TableHead>
-                                        <TableHead className="text-right">Current Price</TableHead>
+                                        <TableHead>Avg. Cost</TableHead>
+                                        <TableHead>Current Price</TableHead>
+                                        <TableHead>Market Value</TableHead>
+                                        <TableHead>Total Gain/Loss</TableHead>
                                         <TableHead className="text-right">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -131,15 +149,26 @@ export default function PortfolioPage() {
                                                     <Button variant="link" asChild className="p-0 h-auto text-base">
                                                         <Link href={`/?symbol=${stock.symbol}`}>{stock.symbol}</Link>
                                                     </Button>
-                                                    <p className="text-xs text-muted-foreground">{stock.name}</p>
+                                                    <p className="text-xs text-muted-foreground truncate">{stock.name}</p>
                                                 </TableCell>
-                                                <TableCell>{stock.quantity}</TableCell>
-                                                <TableCell className="text-right">{formatCurrency(stock.purchasePrice)}</TableCell>
-                                                <TableCell className="text-right">
-                                                    <div className='flex flex-col items-end'>
+                                                <TableCell>{stock.quantity.toLocaleString()}</TableCell>
+                                                <TableCell>{formatCurrency(stock.purchasePrice)}</TableCell>
+                                                <TableCell>
+                                                    <div className='flex flex-col items-start'>
                                                         <span>{formatCurrency(stock.currentPrice)}</span>
                                                         <span className={cn("text-xs", stock.change >= 0 ? "text-green-500" : "text-red-500")}>
                                                             {stock.change.toFixed(2)} ({stock.changePercent.toFixed(2)}%)
+                                                        </span>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>{formatCurrency(stock.totalValue)}</TableCell>
+                                                <TableCell>
+                                                     <div className='flex flex-col items-start'>
+                                                        <span className={cn(stock.totalGainLoss >= 0 ? "text-green-500" : "text-red-500")}>
+                                                          {formatCurrency(stock.totalGainLoss)}
+                                                        </span>
+                                                        <span className={cn("text-xs", stock.totalGainLoss >= 0 ? "text-green-500" : "text-red-500")}>
+                                                          ({stock.totalGainLossPercent.toFixed(2)}%)
                                                         </span>
                                                     </div>
                                                 </TableCell>
