@@ -61,14 +61,11 @@ export function UserNav({ user }: UserNavProps) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
+           <DropdownMenuItem asChild>
+            <Link href="/portfolio">Portfolio</Link>
+          </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/watchlist">Watchlist</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            Profile
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            Settings
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />

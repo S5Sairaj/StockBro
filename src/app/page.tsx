@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -12,6 +13,8 @@ import TrendingStocks from '@/components/trending-stocks';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getStockData, getTrendingStocks } from './actions';
+import AddToPortfolio from '@/components/add-to-portfolio';
+import { useAuth } from '@/hooks/use-auth';
 
 const stockSymbolSchema = z.string().min(1, 'Stock symbol is required.').max(5, 'Stock symbol must be 5 characters or less.');
 
@@ -35,6 +38,7 @@ type StockData = {
 };
 
 export default function Home() {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [stockData, setStockData] = useState<StockData | null>(null);
@@ -120,6 +124,8 @@ export default function Home() {
             </CardContent>
           </Card>
           
+          {!loading && stockData && user && <AddToPortfolio symbol={stockData.symbol!} />}
+
           {!loading && stockData && stockData.prediction?.indicator_recommendations && (
             <IndicatorRecommendations indicators={stockData.prediction.indicator_recommendations} />
           )}
