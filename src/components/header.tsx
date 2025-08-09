@@ -14,12 +14,12 @@ export default function Header() {
       </Link>
       <nav className="ml-auto flex items-center gap-4">
           <Button variant="link" asChild>
-            <Link href="/about" className="text-accent-foreground transition-colors hover:text-accent-foreground/80">
+            <Link href="/about" className="text-white transition-colors hover:text-white/80">
               About
             </Link>
           </Button>
           <Button variant="link" asChild>
-            <Link href="/contact" className="text-accent-foreground transition-colors hover:text-accent-foreground/80">
+            <Link href="/contact" className="text-white transition-colors hover:text-white/80">
               Contact
             </Link>
           </Button>
