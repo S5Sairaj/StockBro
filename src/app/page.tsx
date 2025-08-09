@@ -18,10 +18,19 @@ const stockSymbolSchema = z.string().min(1, 'Stock symbol is required.').max(5, 
 type StockData = {
   details: any;
   historical: any[];
-  prediction?: PredictStockTrendsOutput['tickers'][string];
+  prediction?: {
+      predicted_series: {
+          dates: string[];
+          prices: number[];
+      };
+      indicator_recommendations: {
+          name: string;
+          description: string;
+      }[];
+  };
   symbol?: string;
   timeframe?: string;
-  analysis?: string; // Legacy support for component
+  analysis?: string;
 };
 
 export default function Home() {
@@ -67,33 +76,18 @@ export default function Home() {
         stockSymbol: symbol.toUpperCase(),
         historicalData: historicalDataCsv,
         timeframe: timeframe,
-        // New detailed inputs for the advanced AI
-        tickers: [symbol.toUpperCase()],
-        startDate: historical[0]?.date || 'N/A',
-        endDate: historical[historical.length - 1]?.date || 'N/A',
-        frequency: 'daily',
-        targetProfitPct: 5,
-        horizonDays: 30,
-        probabilityBand: [0.4, 0.6],
-        capital: 100000,
-        maxPositions: 10,
-        riskPerTrade: 0.01,
-        allowedStrategies: ['momentum', 'mean_reversion', 'swing', 'breakout'],
       });
-
-      const primaryTickerPrediction = predictionResult.tickers[symbol.toUpperCase()];
-
-      if (!primaryTickerPrediction) {
-        throw new Error(`AI analysis failed for ${symbol.toUpperCase()}. The model may not have found a suitable trading strategy within the specified probability band.`);
-      }
 
       setStockData({
         details,
         historical,
-        prediction: primaryTickerPrediction,
+        prediction: {
+          predicted_series: predictionResult.predicted_series,
+          indicator_recommendations: predictionResult.indicator_recommendations,
+        },
         symbol: symbol.toUpperCase(),
         timeframe,
-        analysis: primaryTickerPrediction.rationale, // Use rationale for the analysis section
+        analysis: predictionResult.analysis,
       });
 
     } catch (e: any) {
@@ -124,8 +118,8 @@ export default function Home() {
             </CardContent>
           </Card>
           
-          {!loading && stockData && stockData.prediction?.indicatorRecommendations && (
-            <IndicatorRecommendations indicators={stockData.prediction.indicatorRecommendations} />
+          {!loading && stockData && stockData.prediction?.indicator_recommendations && (
+            <IndicatorRecommendations indicators={stockData.prediction.indicator_recommendations} />
           )}
 
           <TrendingStocks 
@@ -158,8 +152,8 @@ export default function Home() {
               />
               <PriceChart 
                 historicalData={stockData.historical} 
-                predictionData={stockData.prediction?.predictedSeries.median.map((price, index) => ({
-                    date: stockData.prediction!.predictedSeries.dates[index],
+                predictionData={stockData.prediction?.predicted_series.prices.map((price, index) => ({
+                    date: stockData.prediction!.predicted_series.dates[index],
                     price: price
                 }))}
               />
