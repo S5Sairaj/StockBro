@@ -23,10 +23,10 @@ export default function StockDetails({ symbol, name, exchange, description, anal
             </div>
             {profitProbability !== undefined && (
                 <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="flex items-center gap-2 py-1 px-3">
-                        <TrendingUp className="h-4 w-4 text-primary" />
+                    <Badge variant="secondary" className="flex items-center gap-2 py-1 px-3">
+                        <TrendingUp className="h-4 w-4 text-accent" />
                         <span className="font-semibold">Profit Probability:</span>
-                        <span className="font-bold text-primary">{(profitProbability * 100).toFixed(0)}%</span>
+                        <span className="font-bold text-accent">{(profitProbability * 100).toFixed(0)}%</span>
                     </Badge>
                 </div>
             )}

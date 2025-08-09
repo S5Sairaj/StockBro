@@ -46,7 +46,7 @@ export default function TrendingStocks({ stocks, isLoading, onStockClick }: Tren
             {stocks.map((stock) => (
               <li 
                 key={stock.symbol} 
-                className="flex items-center justify-between p-4 px-6 hover:bg-muted/50 cursor-pointer transition-colors"
+                className="flex items-center justify-between p-4 px-6 hover:bg-secondary/50 cursor-pointer transition-colors"
                 onClick={() => onStockClick(stock.symbol)}
               >
                 <div className="flex-1 pr-4">
@@ -58,7 +58,7 @@ export default function TrendingStocks({ stocks, isLoading, onStockClick }: Tren
                   <div
                     className={cn(
                       'text-sm flex items-center justify-end gap-1',
-                      stock.change >= 0 ? 'text-green-600' : 'text-red-600'
+                      stock.change >= 0 ? 'text-green-500' : 'text-red-500'
                     )}
                   >
                     {stock.change >= 0 ? (

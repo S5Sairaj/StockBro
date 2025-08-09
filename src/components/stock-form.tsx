@@ -65,13 +65,13 @@ export default function StockForm({ onSearch, loading }: StockFormProps) {
               className="w-full justify-start"
               disabled={loading}
             >
-              <ToggleGroupItem value="daily">Daily</ToggleGroupItem>
-              <ToggleGroupItem value="weekly">Weekly</ToggleGroupItem>
-              <ToggleGroupItem value="monthly">Monthly</ToggleGroupItem>
+              <ToggleGroupItem value="daily" aria-label="Daily">Daily</ToggleGroupItem>
+              <ToggleGroupItem value="weekly" aria-label="Weekly">Weekly</ToggleGroupItem>
+              <ToggleGroupItem value="monthly" aria-label="Monthly">Monthly</ToggleGroupItem>
             </ToggleGroup>
           </FormItem>
           
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full" disabled={loading} variant="secondary">
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

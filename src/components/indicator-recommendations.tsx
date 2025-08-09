@@ -22,7 +22,7 @@ export default function IndicatorRecommendations({ indicators }: IndicatorRecomm
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
-            <Lightbulb className="h-6 w-6 text-primary" />
+            <Lightbulb className="h-6 w-6 text-accent" />
             <CardTitle>Indicator Recommendations</CardTitle>
         </div>
         <CardDescription>

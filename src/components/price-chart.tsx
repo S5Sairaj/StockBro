@@ -12,7 +12,7 @@ interface PriceChartProps {
 const chartConfig = {
   price: {
     label: "Historical Price",
-    color: "hsl(var(--primary))",
+    color: "hsl(var(--chart-1))",
   },
   prediction: {
     label: "AI Prediction",
