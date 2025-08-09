@@ -67,6 +67,9 @@ export function UserNav({ user }: UserNavProps) {
           <DropdownMenuItem asChild>
             <Link href="/watchlist">Watchlist</Link>
           </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/strategies">Strategies</Link>
+          </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>
