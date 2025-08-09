@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { CandlestickChart } from 'lucide-react';
 import { Button } from './ui/button';
