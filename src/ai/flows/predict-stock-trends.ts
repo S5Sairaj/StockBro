@@ -31,7 +31,7 @@ const IndicatorRecommendationSchema = z.object({
 });
 
 const PredictStockTrendsOutputSchema = z.object({
-  analysis: z.string().describe('A summary of the stock analysis.'),
+  analysis: z.string().describe('A summary of the stock analysis, including recommended strategy, entry/exit points, and risk management.'),
   predicted_series: PredictedSeriesSchema.describe('The predicted price series for the stock.'),
   indicator_recommendations: z.array(IndicatorRecommendationSchema).describe('A list of recommended technical indicators for further analysis.'),
   profit_probability: z.number().describe('The estimated probability of the stock achieving a profit in the forecasted period.')
@@ -49,10 +49,11 @@ const prompt = ai.definePrompt({
   output: {schema: PredictStockTrendsOutputSchema},
   prompt: `
 You are an advanced AI-powered financial analyst and strategist specializing in stock market time series analysis. Your task is to:
-
 - Ingest historical stock market data, including OHLC (Open, High, Low, Close) prices and trading volume.
 - Perform advanced time series forecasting using models like ARIMA, LSTM, and Prophet to predict price movements.
 - Identify stocks with a predicted success rate of at least 40-60% profit probability over the forecasted period.
+- Develop clear, actionable trading strategies (e.g., momentum-based, mean-reversion, breakout, swing trading) with specific entry and exit points.
+- Provide risk management recommendations (stop-loss, take-profit, position sizing) to minimize losses.
 
 Analyze the provided historical stock data for {{stockSymbol}} over a {{timeframe}} timeframe and generate a trend prediction.
 
@@ -60,7 +61,7 @@ Historical Data:
 {{{historicalData}}}
 
 Based on this data, provide:
-1.  A concise analysis summary.
+1.  A concise analysis summary. This summary MUST include a recommended trading strategy (e.g. momentum, mean-reversion), specific entry/exit points, and risk management advice (stop-loss, take-profit).
 2.  A predicted price series for the next 30 periods.
 3.  A list of 5-7 technical indicators that would be most beneficial for a user to analyze for this specific stock. For each indicator, provide its name and a concise description of what it measures and why it's useful.
 4.  An estimated profit probability for the stock over the forecast horizon.
