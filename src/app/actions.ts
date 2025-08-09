@@ -74,15 +74,29 @@ export async function getStockData(symbol: string, timeframe: string) {
 
 export async function getTrendingStocks() {
     try {
-        const result = await yahooFinance.trendingSymbols('US', { count: 10 });
-        const quotes = result.quotes?.filter(q => 
-            q.quoteType === 'EQUITY' && 
-            typeof q.regularMarketPrice === 'number' && 
-            typeof q.regularMarketChange === 'number' &&
-            typeof q.regularMarketChangePercent === 'number'
-        ) || [];
+        // Fetch trending stocks for multiple regions to increase chances of getting data
+        const regions = ['US', 'GB', 'IN', 'CA'];
+        let quotes: any[] = [];
+        for (const region of regions) {
+            const result = await yahooFinance.trendingSymbols(region, { count: 10 });
+            if (result.quotes) {
+                quotes.push(...result.quotes);
+            }
+        }
         
-        const trending = quotes.slice(0, 5).map(q => ({
+        const uniqueSymbols = new Set();
+
+        const trending = quotes.filter(q => {
+            const isEquity = q.quoteType === 'EQUITY';
+            const hasPrice = typeof q.regularMarketPrice === 'number';
+            const hasChange = typeof q.regularMarketChange === 'number';
+            const isUnique = !uniqueSymbols.has(q.symbol);
+            if(isEquity && hasPrice && hasChange && isUnique) {
+                uniqueSymbols.add(q.symbol);
+                return true;
+            }
+            return false;
+        }).slice(0, 5).map(q => ({
             symbol: q.symbol,
             name: q.longName || q.shortName || q.symbol,
             price: q.regularMarketPrice || 0,
@@ -90,11 +104,14 @@ export async function getTrendingStocks() {
             changePercent: q.regularMarketChangePercent || 0,
         }));
 
+        if (trending.length === 0) {
+            console.warn("Could not fetch any trending stocks.");
+        }
+
         return trending;
     } catch (error) {
         if (error instanceof Error) {
             console.error('Failed to fetch trending stocks:', error.message);
-            console.error('Stack trace:', error.stack);
         } else {
             console.error('An unknown error occurred while fetching trending stocks:', error);
         }
