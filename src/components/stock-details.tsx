@@ -1,5 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { TrendingUp } from 'lucide-react';
 
 interface StockDetailsProps {
   symbol: string;
@@ -7,9 +9,10 @@ interface StockDetailsProps {
   exchange: string;
   description?: string;
   analysis?: string;
+  profitProbability?: number;
 }
 
-export default function StockDetails({ symbol, name, exchange, description, analysis }: StockDetailsProps) {
+export default function StockDetails({ symbol, name, exchange, description, analysis, profitProbability }: StockDetailsProps) {
   return (
     <Card>
       <CardHeader>
@@ -18,6 +21,15 @@ export default function StockDetails({ symbol, name, exchange, description, anal
                 <CardTitle>{name} ({symbol})</CardTitle>
                 <CardDescription>{exchange}</CardDescription>
             </div>
+            {profitProbability !== undefined && (
+                <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="flex items-center gap-2 py-1 px-3">
+                        <TrendingUp className="h-4 w-4 text-primary" />
+                        <span className="font-semibold">Profit Probability:</span>
+                        <span className="font-bold text-primary">{(profitProbability * 100).toFixed(0)}%</span>
+                    </Badge>
+                </div>
+            )}
         </div>
       </CardHeader>
       <CardContent className="space-y-4">

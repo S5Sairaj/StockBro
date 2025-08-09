@@ -33,7 +33,8 @@ const IndicatorRecommendationSchema = z.object({
 const PredictStockTrendsOutputSchema = z.object({
   analysis: z.string().describe('A summary of the stock analysis.'),
   predicted_series: PredictedSeriesSchema.describe('The predicted price series for the stock.'),
-  indicator_recommendations: z.array(IndicatorRecommendationSchema).describe('A list of recommended technical indicators for further analysis.')
+  indicator_recommendations: z.array(IndicatorRecommendationSchema).describe('A list of recommended technical indicators for further analysis.'),
+  profit_probability: z.number().describe('The estimated probability of the stock achieving a profit in the forecasted period.')
 });
 
 export type PredictStockTrendsOutput = z.infer<typeof PredictStockTrendsOutputSchema>;
@@ -59,9 +60,10 @@ Historical Data:
 {{{historicalData}}}
 
 Based on this data, provide:
-1.  A concise analysis summary, including an assessment of the profit probability.
+1.  A concise analysis summary.
 2.  A predicted price series for the next 30 periods.
 3.  A list of 5-7 technical indicators that would be most beneficial for a user to analyze for this specific stock. For each indicator, provide its name and a concise description of what it measures and why it's useful.
+4.  An estimated profit probability for the stock over the forecast horizon.
 `,
 });
 

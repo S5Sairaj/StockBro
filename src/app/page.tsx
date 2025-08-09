@@ -27,6 +27,7 @@ type StockData = {
           name: string;
           description: string;
       }[];
+      profit_probability?: number;
   };
   symbol?: string;
   timeframe?: string;
@@ -84,6 +85,7 @@ export default function Home() {
         prediction: {
           predicted_series: predictionResult.predicted_series,
           indicator_recommendations: predictionResult.indicator_recommendations,
+          profit_probability: predictionResult.profit_probability,
         },
         symbol: symbol.toUpperCase(),
         timeframe,
@@ -149,6 +151,7 @@ export default function Home() {
                 exchange={stockData.details.exchange}
                 description={stockData.details.description}
                 analysis={stockData.analysis}
+                profitProbability={stockData.prediction?.profit_probability}
               />
               <PriceChart 
                 historicalData={stockData.historical} 
