@@ -97,7 +97,7 @@ export async function getNews(query: string = 'market news') {
             link: item.link,
             providerPublishTime: new Date(item.providerPublishTime * 1000).toLocaleDateString(),
             thumbnail: item.thumbnail?.resolutions?.find(t => t.tag === 'm')?.url
-        })).filter(item => item.thumbnail);
+        }));
     } catch (error) {
         console.error(`Failed to fetch news for query "${query}":`, error);
         return [];
