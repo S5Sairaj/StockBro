@@ -7,9 +7,12 @@ import { Button } from './ui/button';
 import { ThemeToggle } from './theme-toggle';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/use-auth';
+import { UserNav } from './user-nav';
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const { user, loading } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,30 +30,44 @@ export default function Header() {
 
   return (
     <header className={cn(
-        "sticky top-0 flex h-16 items-center gap-4 bg-[--custom-green] px-4 md:px-6 z-10 transition-all duration-300",
-        scrolled ? "bg-opacity-90 backdrop-blur-sm border-b" : "bg-opacity-100 border-b border-transparent"
+        "sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 z-10 transition-all duration-300",
+        scrolled ? "bg-opacity-90 backdrop-blur-sm" : ""
     )}>
       <Link href="/" className="flex items-center gap-2">
-        <CandlestickChart className="h-6 w-6 text-accent-foreground" />
-        <h1 className="text-xl font-bold tracking-tight text-accent-foreground">StockBro</h1>
+        <CandlestickChart className="h-6 w-6 text-primary" />
+        <h1 className="text-xl font-bold tracking-tight text-foreground">MarketGazer</h1>
       </Link>
       <nav className="ml-auto flex items-center gap-4">
           <Button variant="ghost" asChild>
-            <Link href="/news" className="text-accent-foreground no-underline hover:text-accent-foreground/80 transition-colors">
+            <Link href="/news" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
               News
             </Link>
           </Button>
           <Button variant="ghost" asChild>
-            <Link href="/about" className="text-accent-foreground no-underline hover:text-accent-foreground/80 transition-colors">
+            <Link href="/about" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
               About
             </Link>
           </Button>
           <Button variant="ghost" asChild>
-            <Link href="/contact" className="text-accent-foreground no-underline hover:text-accent-foreground/80 transition-colors">
+            <Link href="/contact" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
               Contact
             </Link>
           </Button>
           <ThemeToggle />
+          {!loading && (
+            user ? (
+              <UserNav user={user} />
+            ) : (
+              <div className="flex items-center gap-2">
+                 <Button variant="ghost" asChild>
+                    <Link href="/login">Login</Link>
+                 </Button>
+                 <Button asChild>
+                    <Link href="/signup">Sign Up</Link>
+                 </Button>
+              </div>
+            )
+          )}
       </nav>
     </header>
   );

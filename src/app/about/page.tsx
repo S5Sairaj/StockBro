@@ -6,7 +6,7 @@ export default function AboutPage() {
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold tracking-tight mb-6">About StockBro</h2>
+        <h2 className="text-3xl font-bold tracking-tight mb-6">About MarketGazer</h2>
         
         <Card>
           <CardHeader>
@@ -14,7 +14,7 @@ export default function AboutPage() {
           </CardHeader>
           <CardContent className="text-muted-foreground space-y-4">
             <p>
-              StockBro is a powerful financial analytics dashboard designed to empower investors with AI-driven insights. 
+              MarketGazer is a powerful financial analytics dashboard designed to empower investors with AI-driven insights. 
               Our mission is to make sophisticated stock market analysis accessible to everyone, from seasoned traders to curious beginners. 
               We believe that with the right tools, anyone can make informed decisions and navigate the complexities of the financial markets.
             </p>
