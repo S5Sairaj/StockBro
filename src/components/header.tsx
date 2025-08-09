@@ -34,12 +34,12 @@ export default function Header() {
         <h1 className="text-xl font-bold tracking-tight text-accent-foreground">StockBro</h1>
       </Link>
       <nav className="ml-auto flex items-center gap-4">
-          <Button variant="link" asChild>
+          <Button variant="ghost" asChild>
             <Link href="/about" className="text-accent-foreground no-underline hover:text-accent-foreground/80 transition-colors">
               About
             </Link>
           </Button>
-          <Button variant="link" asChild>
+          <Button variant="ghost" asChild>
             <Link href="/contact" className="text-accent-foreground no-underline hover:text-accent-foreground/80 transition-colors">
               Contact
             </Link>
