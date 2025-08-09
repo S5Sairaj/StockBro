@@ -2,8 +2,8 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
-import { Bar, BarChart, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer, Line, ComposedChart } from 'recharts';
+import { ChartContainer, ChartTooltip, type ChartConfig } from '@/components/ui/chart';
+import { ComposedChart, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer, Line, Bar } from 'recharts';
 import { cn } from '@/lib/utils';
 
 
@@ -25,22 +25,29 @@ const chartConfig = {
 // Custom shape for the candlestick
 const Candlestick = (props: any) => {
     const { x, y, width, height, low, high, open, close } = props;
-    const isBullish = close > open;
 
-    const color = isBullish ? 'hsl(var(--custom-green))' : 'hsl(var(--custom-red))';
-    const wickColor = isBullish ? 'hsl(var(--custom-green))' : 'hsl(var(--custom-red))';
+    // Guard against rendering if data is invalid
+    if (open === undefined || close === undefined || low === undefined || high === undefined) {
+      return null;
+    }
+
+    const isBullish = close > open;
+    const isRed = open > close;
+
+    const wickColor = isRed ? 'hsl(var(--custom-red))' : 'hsl(var(--custom-green))';
+    const bodyColor = isRed ? 'hsl(var(--custom-red))' : 'hsl(var(--custom-green))';
     
     return (
-        <g stroke={wickColor} fill={color} strokeWidth="1">
+        <g stroke={wickColor} fill={bodyColor} strokeWidth="1">
             {/* Wick */}
-            <line x1={x + width / 2} y1={y} x2={x + width / 2} y2={height} />
+            <line x1={x + width / 2} y1={y} x2={x + width / 2} y2={y + height} stroke={wickColor} />
 
             {/* Body */}
             <rect 
               x={x} 
-              y={isBullish ? close : open} 
+              y={isBullish ? y + (high - close) : y + (high - open)}
               width={width} 
-              height={Math.abs(open - close)}
+              height={Math.max(1, Math.abs(open - close))}
             />
         </g>
     );
@@ -51,12 +58,12 @@ export default function PriceChart({ historicalData, predictionData }: PriceChar
 
   const mappedHistorical = historicalData.map(d => ({
     date: d.date,
-    ohlc: [d.open, d.high, d.low, d.close]
+    price: [d.open, d.high, d.low, d.close],
   }));
 
   const mappedPrediction = predictionData ? predictionData.map(d => ({ date: d.date, prediction: d.price })) : [];
   
-  const combinedData = [...mappedHistorical];
+  const combinedData: any[] = [...mappedHistorical];
   
   mappedPrediction.forEach(pred => {
     const existingEntry = combinedData.find(d => d.date === pred.date);
@@ -65,7 +72,7 @@ export default function PriceChart({ historicalData, predictionData }: PriceChar
     } else {
       combinedData.push({
           date: pred.date,
-          ohlc: null,
+          price: null,
           prediction: pred.prediction,
       });
     }
@@ -113,7 +120,7 @@ export default function PriceChart({ historicalData, predictionData }: PriceChar
                 content={({ active, payload, label }) => {
                     if (active && payload && payload.length) {
                         const data = payload[0].payload;
-                        const ohlc = data.ohlc;
+                        const ohlc = data.price;
                         const prediction = data.prediction;
                         const color = ohlc && ohlc[3] > ohlc[0] ? 'text-green-500' : 'text-red-500';
 
@@ -135,7 +142,7 @@ export default function PriceChart({ historicalData, predictionData }: PriceChar
               />
               <Legend />
 
-              <Bar dataKey="ohlc" name="Price" fill="hsl(var(--chart-1))" shape={<Candlestick />} />
+              <Bar dataKey="price" name="Price" fill="hsl(var(--chart-1))" shape={<Candlestick />} />
 
               <Line
                 type="monotone"
