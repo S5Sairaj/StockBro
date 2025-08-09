@@ -15,10 +15,19 @@ import { getStockData, getTrendingStocks } from './actions';
 
 const stockSymbolSchema = z.string().min(1, 'Stock symbol is required.').max(5, 'Stock symbol must be 5 characters or less.');
 
+type StockData = {
+  details: any;
+  historical: any[];
+  prediction?: PredictStockTrendsOutput['tickers'][string];
+  symbol?: string;
+  timeframe?: string;
+  analysis?: string; // Legacy support for component
+};
+
 export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [stockData, setStockData] = useState<{ details: any; historical: any[]; prediction?: PredictStockTrendsOutput; analysis?: string; symbol?: string; timeframe?: string; } | null>(null);
+  const [stockData, setStockData] = useState<StockData | null>(null);
   const [trendingStocks, setTrendingStocks] = useState<any[]>([]);
   const [isTrendingLoading, setIsTrendingLoading] = useState(true);
   
@@ -58,14 +67,33 @@ export default function Home() {
         stockSymbol: symbol.toUpperCase(),
         historicalData: historicalDataCsv,
         timeframe: timeframe,
+        // New detailed inputs for the advanced AI
+        tickers: [symbol.toUpperCase()],
+        startDate: historical[0]?.date || 'N/A',
+        endDate: historical[historical.length - 1]?.date || 'N/A',
+        frequency: 'daily',
+        targetProfitPct: 5,
+        horizonDays: 30,
+        probabilityBand: [0.4, 0.6],
+        capital: 100000,
+        maxPositions: 10,
+        riskPerTrade: 0.01,
+        allowedStrategies: ['momentum', 'mean_reversion', 'swing', 'breakout'],
       });
+
+      const primaryTickerPrediction = predictionResult.tickers[symbol.toUpperCase()];
+
+      if (!primaryTickerPrediction) {
+        throw new Error(`AI analysis failed for ${symbol.toUpperCase()}. The model may not have found a suitable trading strategy within the specified probability band.`);
+      }
 
       setStockData({
         details,
         historical,
-        prediction: predictionResult,
+        prediction: primaryTickerPrediction,
         symbol: symbol.toUpperCase(),
         timeframe,
+        analysis: primaryTickerPrediction.rationale, // Use rationale for the analysis section
       });
 
     } catch (e: any) {
@@ -126,11 +154,14 @@ export default function Home() {
                 name={stockData.details.name}
                 exchange={stockData.details.exchange}
                 description={stockData.details.description}
-                analysis={stockData.prediction?.analysis}
+                analysis={stockData.analysis}
               />
               <PriceChart 
                 historicalData={stockData.historical} 
-                predictionData={stockData.prediction?.trendPrediction}
+                predictionData={stockData.prediction?.predictedSeries.median.map((price, index) => ({
+                    date: stockData.prediction!.predictedSeries.dates[index],
+                    price: price
+                }))}
               />
             </div>
           )}
