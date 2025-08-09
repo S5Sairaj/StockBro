@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -37,6 +38,11 @@ export default function Header() {
         <h1 className="text-xl font-bold tracking-tight text-foreground">StockBro</h1>
       </Link>
       <nav className="ml-auto flex items-center gap-4">
+          <Button variant="ghost" asChild>
+            <Link href="/compare" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+              Compare
+            </Link>
+          </Button>
           <Button variant="ghost" asChild>
             <Link href="/news" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
               News

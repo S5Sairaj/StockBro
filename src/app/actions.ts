@@ -160,3 +160,44 @@ export async function summarizeNewsArticle(url: string) {
     }
     return await summarizeNews({ article: articleText });
 }
+
+export async function getComparisonData(symbols: string[]) {
+    try {
+        const promises = symbols.map(symbol => 
+            yahooFinance.quoteSummary(symbol.toUpperCase(), {
+                modules: ["price", "summaryDetail", "financialData"]
+            })
+        );
+        
+        const results = await Promise.all(promises);
+
+        const data = results.map((summary, index) => {
+            if (!summary.price || !summary.summaryDetail || !summary.financialData) {
+                return {
+                    symbol: symbols[index].toUpperCase(),
+                    name: `${symbols[index].toUpperCase()} (Data not found)`,
+                    price: 'N/A',
+                    marketCap: 'N/A',
+                    peRatio: 'N/A',
+                    dividendYield: 'N/A',
+                    analystRecommendation: 'N/A'
+                };
+            }
+            return {
+                symbol: summary.price.symbol,
+                name: summary.price.longName || summary.price.shortName,
+                price: summary.price.regularMarketPrice,
+                marketCap: summary.summaryDetail.marketCap,
+                peRatio: summary.summaryDetail.trailingPE,
+                dividendYield: summary.summaryDetail.dividendYield,
+                analystRecommendation: summary.financialData.recommendationKey,
+            };
+        });
+
+        return data;
+
+    } catch (error) {
+        console.error('Failed to fetch comparison data', error);
+        throw new Error('Failed to fetch comparison data. Please check the stock symbols.');
+    }
+}
